@@ -1,8 +1,3 @@
-/**
- * Admin Panel Controller
- * Handles all admin panel page rendering and logic
- */
-
 const bcrypt = require("bcryptjs");
 const { prisma } = require("../config/db");
 const { asyncHandler } = require("../middleware/errorHandler");
@@ -20,9 +15,48 @@ const showLogin = asyncHandler(async (req, res) => {
   });
 });
 
+/* ===========================
+   CREATE ADMIN USER (ONE-TIME / SUPER ADMIN)
+=========================== */
+const createAdminUser = asyncHandler(async (req, res) => {
+  const { username, email, password, role } = req.body;
+
+  if (!username || !email || !password) {
+    req.flash("error", "All fields are required");
+    return res.redirect("/admin/users/create");
+  }
+
+  // Check existing user
+  const exists = await prisma.adminUser.findFirst({
+    where: {
+      OR: [{ username }, { email }],
+    },
+  });
+
+  if (exists) {
+    req.flash("error", "Username or email already exists");
+    return res.redirect("/admin/users/create");
+  }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+
+  await prisma.adminUser.create({
+    data: {
+      username,
+      email,
+      password: hashedPassword,
+      role: role || "moderator", // enum value
+    },
+  });
+
+  req.flash("success", "Admin user created successfully");
+  res.redirect("/admin/users");
+});
+
 /**
  * Handle login
  */
+
 const login = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
   console.log(username, password);
@@ -43,7 +77,6 @@ const login = asyncHandler(async (req, res) => {
 
     return res.redirect("/admin/login");
   }
-
   req.session.adminId = admin.id;
   req.session.admin = {
     id: admin.id,
@@ -51,7 +84,6 @@ const login = asyncHandler(async (req, res) => {
     email: admin.email,
     fullName: admin.fullName,
   };
-
   req.flash("success", "Login successful!");
   res.redirect("/admin/dashboard");
 });
@@ -73,29 +105,23 @@ const showDashboard = asyncHandler(async (req, res) => {
   // BASIC STATS
   // =====================
   const totalAdmissions = await prisma.admission.count();
-
   const pendingAdmissions = await prisma.admission.count({
     where: { status: "pending" },
   });
-
   const approvedAdmissions = await prisma.admission.count({
     where: { status: "approved" },
   });
-
   const rejectedAdmissions = await prisma.admission.count({
     where: { status: "rejected" },
   });
-
   const totalGallery = await prisma.gallery.count();
-
-  // =====================
+  // ====================
   // RECENT ADMISSIONS
   // =====================
   const recentAdmissions = await prisma.admission.findMany({
     take: 5,
     orderBy: { createdAt: "desc" },
   });
-
   // =====================
   // ADMISSIONS BY COURSE
   // =====================
@@ -105,12 +131,10 @@ const showDashboard = asyncHandler(async (req, res) => {
       course: true,
     },
   });
-
   // Sort by count DESC in JS (Prisma limitation)
   const admissionsByCourse = admissionsByCourseRaw
     .sort((a, b) => b._count.course - a._count.course)
     .slice(0, 6);
-
   // =====================
   // ADMISSIONS BY CATEGORY
   // =====================
@@ -120,13 +144,11 @@ const showDashboard = asyncHandler(async (req, res) => {
       category: true,
     },
   });
-
   // =====================
   // ADMISSIONS BY MONTH (LAST 6 MONTHS)
   // =====================
   const sixMonthsAgo = new Date();
   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-
   const admissionsByMonth = await prisma.$queryRaw`
     SELECT 
       DATE_FORMAT(createdAt, '%Y-%m') AS month,
@@ -375,6 +397,8 @@ const listGallery = asyncHandler(async (req, res) => {
     },
   });
 
+  console.log(galleryItems);
+
   res.render("admin/gallery/list", {
     layout: "layouts/main",
     isAuthenticated: true,
@@ -409,15 +433,13 @@ const createGallery = asyncHandler(async (req, res) => {
     req.flash("error", "Image is required");
     return res.redirect("/admin/gallery/create");
   }
-
   const { title, description, category, display_order } = req.body;
-
   await prisma.gallery.create({
     data: {
       title,
       description,
       image: `/uploads/gallery/${req.file.filename}`,
-      category: category.toLowerCase(), // must match enum
+      category: category.toLowerCase(),
       displayOrder: Number(display_order) || 0,
       isActive: true,
     },

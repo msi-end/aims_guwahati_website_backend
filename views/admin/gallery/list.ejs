@@ -36,7 +36,7 @@
   <% galleryItems.forEach(item => { %>
   <div class="gallery-item bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition transform hover:-translate-y-2 cursor-move" data-id="<%= item.id %>">
     <div class="relative">
-      <img src="<%= item.imageUrl %>" alt="<%= item.title %>" class="w-full h-56 object-cover">
+      <img src="<%= item.image %>" alt="<%= item.title %>" class="w-full h-56 object-cover">
       <% if (item.isFeatured) { %>
       <span class="absolute top-2 right-2 px-3 py-1 bg-yellow-400 text-yellow-900 text-xs font-bold rounded-full flex items-center">
         <i class="fas fa-star mr-1"></i>Featured
@@ -95,24 +95,26 @@
             order: index
           });
         });
-        
+
         // Send AJAX request to update order
         fetch('/admin/gallery/reorder', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ items })
-        })
-        .then(res => res.json())
-        .then(data => {
-          console.log('Order updated successfully');
-          // Optional: Show success message
-        })
-        .catch(err => {
-          console.error('Failed to update order:', err);
-          alert('Failed to update order. Please refresh the page.');
-        });
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              items
+            })
+          })
+          .then(res => res.json())
+          .then(data => {
+            console.log('Order updated successfully');
+            // Optional: Show success message
+          })
+          .catch(err => {
+            console.error('Failed to update order:', err);
+            alert('Failed to update order. Please refresh the page.');
+          });
       }
     });
   }
