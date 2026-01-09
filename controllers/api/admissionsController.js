@@ -2,7 +2,6 @@ const prisma = require("../../config/db");
 const { sendSuccess, sendError } = require("../../utils/apiResponse");
 const fs = require("fs");
 
-// POST /api/admissions (Public)
 exports.createAdmission = async (req, res) => {
   try {
     const photoPath = req.file ? req.file.path : null;
@@ -29,6 +28,7 @@ exports.createAdmission = async (req, res) => {
     return sendError(res, error.message);
   }
 };
+
 
 exports.getAdmissions = async (req, res) => {
   try {
@@ -61,7 +61,7 @@ exports.getAdmissions = async (req, res) => {
     return sendError(res, error.message);
   }
 };
-// GET /api/admissions/:id (Admin Only)
+
 exports.getAdmissionById = async (req, res) => {
   try {
     const admission = await prisma.admission.findUnique({
@@ -74,36 +74,18 @@ exports.getAdmissionById = async (req, res) => {
   }
 };
 
-// PATCH update status (Admin only) - THIS WAS MISSING
-exports.updateStatus = async (req, res) => {
-  try {
-    const { status } = req.body;
-    const { id } = req.params;
 
-    const updated = await prisma.admission.update({
-      where: { id: parseInt(id) },
-      data: { status },
-    });
-
-    return sendSuccess(res, `Status updated to ${status}`, updated);
-  } catch (error) {
-    return sendError(res, "Failed to update status. Ensure the ID is correct.");
-  }
-};
-// DELETE /api/admissions/:id (Admin Only)
 exports.deleteAdmission = async (req, res) => {
   try {
     const id = parseInt(req.params.id);
-    // Find the record first to get the image path
     const record = await prisma.admission.findUnique({ where: { id } });
 
     if (
       record?.passportPhotograph &&
       fs.existsSync(record.passportPhotograph)
     ) {
-      fs.unlinkSync(record.passportPhotograph); // Remove image file
+      fs.unlinkSync(record.passportPhotograph);
     }
-
     await prisma.admission.delete({ where: { id } });
     return sendSuccess(res, "Admission record deleted");
   } catch (error) {

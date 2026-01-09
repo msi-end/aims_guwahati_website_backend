@@ -14,7 +14,7 @@ router.post(
 );
 
 // Admin routes: Manage admissions
-router.get("/", auth, admissionCtrl.getAdmissions);
+router.get("/", admissionCtrl.getAdmissions);
 router.get("/:id", auth, admissionCtrl.getAdmissionById);
 router.patch("/:id/status", auth, admissionCtrl.updateStatus);
 router.delete("/:id", auth, admissionCtrl.deleteAdmission);
