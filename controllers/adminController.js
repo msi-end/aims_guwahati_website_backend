@@ -20,37 +20,45 @@ const showLogin = asyncHandler(async (req, res) => {
 =========================== */
 const createAdminUser = asyncHandler(async (req, res) => {
   const { username, email, password, role } = req.body;
-
   if (!username || !email || !password) {
     req.flash("error", "All fields are required");
-    return res.redirect("/admin/users/create");
+    res.status(401).json({
+      success: true,
+      message: "All fields are required",
+      data: null,
+    });
+    return;
   }
-
   // Check existing user
   const exists = await prisma.adminUser.findFirst({
     where: {
       OR: [{ username }, { email }],
     },
   });
-
   if (exists) {
     req.flash("error", "Username or email already exists");
-    return res.redirect("/admin/users/create");
+    res.status(401).json({
+      success: true,
+      message: "Username or email already exists",
+      data: null,
+    });
+    return;
   }
-
   const hashedPassword = await bcrypt.hash(password, 10);
-
   await prisma.adminUser.create({
     data: {
       username,
       email,
       password: hashedPassword,
-      role: role || "moderator", 
+      role: role || "moderator",
     },
   });
-
   req.flash("success", "Admin user created successfully");
-  res.redirect("/admin/users");
+  res.status(200).json({
+    success: true,
+    message: "Admin user created successfully",
+    data: null,
+  });
 });
 
 /**
