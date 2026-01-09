@@ -1,0 +1,111 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Admission {
+  id                                  Int             @id @default(autoincrement())
+  fullName                            String          @db.VarChar(255)
+  email                               String          @unique @db.VarChar(255)
+  phoneNumber                         String          @db.VarChar(15)
+  course                              String          @db.Text
+  dateOfBirth                         DateTime        @db.Date
+  category                            Category
+  
+  // Parental Details
+  fatherName                          String          @db.VarChar(255)
+  fatherOccupation                    String?         @db.VarChar(100)
+  fatherPhoneNumber                   String?         @db.VarChar(15)
+  motherName                          String          @db.VarChar(255)
+  motherOccupation                    String?         @db.VarChar(100)
+  motherPhoneNumber                   String?         @db.VarChar(15)
+  
+  // Address Details
+  addressLine1                        String          @db.Text
+  addressLine2                        String?         @db.Text
+  state                               String          @db.VarChar(100)
+  district                            String          @db.VarChar(100)
+  pinCode                             String          @db.VarChar(10)
+  
+  // Academic Records
+  passportPhotograph                  String?         @db.VarChar(255)
+  qualifyingExamAppeared              String?         @db.VarChar(100)
+  qualifyingExamPercentageOrPercentile String?        @db.VarChar(50)
+  graduationDiscipline                String?         @db.VarChar(100)
+  graduationOtherDisciplineDetails    String?         @db.Text
+  graduationSpecialisation            String?         @db.VarChar(100)
+  otherQualification                  String?         @db.Text
+  postGraduationDegree                String?         @db.VarChar(100)
+  
+  // Grades
+  percentageMarksClass10              Decimal?        @db.Decimal(5, 2)
+  class12Stream                       Stream?
+  percentageMarksClass12              Decimal?        @db.Decimal(5, 2)
+  percentageMarksGraduation           Decimal?        @db.Decimal(5, 2)
+  percentageMarksPostGraduation       Decimal?        @db.Decimal(5, 2)
+  
+  // Metadata
+  status                              AdmissionStatus @default(pending)
+  createdAt                           DateTime        @default(now())
+  updatedAt                           DateTime        @updatedAt
+
+  @@map("admissions")
+}
+
+model Gallery {
+  id           Int             @id @default(autoincrement())
+  image        String          @db.VarChar(500)
+  title        String          @db.VarChar(255)
+  category     String          @db.VarChar(50)
+  description  String?         @db.Text
+  displayOrder Int             @default(0)
+  isActive     Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@map("gallery")
+}
+
+model AdminUser {
+  id        Int       @id @default(autoincrement())
+  username  String    @unique @db.VarChar(100)
+  email     String    @unique @db.VarChar(255)
+  password  String    @db.VarChar(255)
+  role      AdminRole @default(moderator)
+  isActive  Boolean   @default(true)
+  lastLogin DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@map("admin_users")
+}
+
+// Enums
+enum Category {
+  General
+  OBC
+  SC
+  ST
+}
+
+enum Stream {
+  Science
+  Commerce
+  Arts
+}
+
+enum AdmissionStatus {
+  pending
+  approved
+  rejected
+}
+
+enum AdminRole {
+  admin
+  moderator
+}

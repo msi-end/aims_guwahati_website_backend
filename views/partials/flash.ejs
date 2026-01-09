@@ -1,0 +1,82 @@
+<% if (success_msg && success_msg.length > 0) { %>
+  <div class="mb-6 p-4 bg-green-50 border-l-4 border-green-500 rounded-r-lg shadow-sm animate-fade-in alert-dismissible" role="alert">
+    <div class="flex items-center">
+      <div class="flex-shrink-0">
+        <i class="fas fa-check-circle text-green-500 text-xl"></i>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm font-medium text-green-800">
+          <%= success_msg[0] %>
+        </p>
+      </div>
+      <button onclick="this.parentElement.parentElement.remove()" class="ml-auto">
+        <i class="fas fa-times text-green-500 hover:text-green-700"></i>
+      </button>
+    </div>
+  </div>
+<% } %>
+
+<% if (error_msg && error_msg.length > 0) { %>
+  <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 rounded-r-lg shadow-sm animate-fade-in alert-dismissible" role="alert">
+    <div class="flex items-center">
+      <div class="flex-shrink-0">
+        <i class="fas fa-exclamation-circle text-red-500 text-xl"></i>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm font-medium text-red-800">
+          <%= error_msg[0] %>
+        </p>
+      </div>
+      <button onclick="this.parentElement.parentElement.remove()" class="ml-auto">
+        <i class="fas fa-times text-red-500 hover:text-red-700"></i>
+      </button>
+    </div>
+  </div>
+<% } %>
+
+<% if (info_msg && info_msg.length > 0) { %>
+  <div class="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg shadow-sm animate-fade-in alert-dismissible" role="alert">
+    <div class="flex items-center">
+      <div class="flex-shrink-0">
+        <i class="fas fa-info-circle text-blue-500 text-xl"></i>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm font-medium text-blue-800">
+          <%= info_msg[0] %>
+        </p>
+      </div>
+      <button onclick="this.parentElement.parentElement.remove()" class="ml-auto">
+        <i class="fas fa-times text-blue-500 hover:text-blue-700"></i>
+      </button>
+    </div>
+  </div>
+<% } %>
+
+<% if (warning_msg && warning_msg.length > 0) { %>
+  <div class="mb-6 p-4 bg-yellow-50 border-l-4 border-yellow-500 rounded-r-lg shadow-sm animate-fade-in alert-dismissible" role="alert">
+    <div class="flex items-center">
+      <div class="flex-shrink-0">
+        <i class="fas fa-exclamation-triangle text-yellow-500 text-xl"></i>
+      </div>
+      <div class="ml-3">
+        <p class="text-sm font-medium text-yellow-800">
+          <%= warning_msg[0] %>
+        </p>
+      </div>
+      <button onclick="this.parentElement.parentElement.remove()" class="ml-auto">
+        <i class="fas fa-times text-yellow-500 hover:text-yellow-700"></i>
+      </button>
+    </div>
+  </div>
+<% } %>
+
+<script>
+  // Auto-dismiss flash messages after 5 seconds
+  setTimeout(() => {
+    document.querySelectorAll('.alert-dismissible').forEach(alert => {
+      alert.style.transition = 'opacity 0.5s';
+      alert.style.opacity = '0';
+      setTimeout(() => alert.remove(), 500);
+    });
+  }, 5000);
+</script>

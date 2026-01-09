@@ -1,0 +1,128 @@
+<% 
+  const title = 'Gallery Management';
+  const pageTitle = 'Gallery Management';
+  const pageDescription = 'Manage school gallery images with drag-and-drop reordering';
+%>
+
+<!-- Category Filter -->
+<div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+  <div class="flex flex-col md:flex-row items-center justify-between space-y-4 md:space-y-0">
+    <div class="flex items-center space-x-4">
+      <label class="text-sm font-medium text-gray-700">Filter by Category:</label>
+      <select onchange="window.location.href='/admin/gallery?category='+this.value" class="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+        <option value="" <%= currentCategory === 'all' ? 'selected' : '' %>>All Categories</option>
+        <% categories.forEach(cat => { %>
+        <option value="<%= cat.name %>" <%= currentCategory === cat.name ? 'selected' : '' %>>
+          <%= cat.name %> (<%= cat.count %>)
+        </option>
+        <% }); %>
+      </select>
+    </div>
+    <a href="/admin/gallery/create" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition inline-flex items-center">
+      <i class="fas fa-plus mr-2"></i>Add New Image
+    </a>
+  </div>
+</div>
+
+<div class="mb-4 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+  <p class="text-sm text-blue-800">
+    <i class="fas fa-info-circle mr-2"></i>
+    <strong>Tip:</strong> Drag and drop images to reorder them. Changes are saved automatically.
+  </p>
+</div>
+
+<!-- Gallery Grid -->
+<div id="gallery-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+  <% galleryItems.forEach(item => { %>
+  <div class="gallery-item bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition transform hover:-translate-y-2 cursor-move" data-id="<%= item.id %>">
+    <div class="relative">
+      <img src="<%= item.imageUrl %>" alt="<%= item.title %>" class="w-full h-56 object-cover">
+      <% if (item.isFeatured) { %>
+      <span class="absolute top-2 right-2 px-3 py-1 bg-yellow-400 text-yellow-900 text-xs font-bold rounded-full flex items-center">
+        <i class="fas fa-star mr-1"></i>Featured
+      </span>
+      <% } %>
+      <div class="absolute top-2 left-2 px-3 py-1 bg-blue-600 text-white text-xs font-medium rounded-full">
+        <%= item.category %>
+      </div>
+    </div>
+    <div class="p-4">
+      <h3 class="font-bold text-gray-900 mb-2 truncate"><%= item.title %></h3>
+      <p class="text-sm text-gray-600 mb-4 line-clamp-2"><%= item.description || 'No description' %></p>
+      <div class="flex items-center justify-between">
+        <span class="text-xs text-gray-500">
+          Order: <%= item.displayOrder %>
+        </span>
+        <div class="flex space-x-2">
+          <a href="/admin/gallery/<%= item.id %>/edit" class="text-blue-600 hover:text-blue-900 transition" title="Edit">
+            <i class="fas fa-edit"></i>
+          </a>
+          <form action="/admin/gallery/<%= item.id %>/delete" method="POST" class="inline" onsubmit="return confirm('Delete this image?')">
+            <button type="submit" class="text-red-600 hover:text-red-900 transition" title="Delete">
+              <i class="fas fa-trash"></i>
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <% }); %>
+</div>
+
+<% if (galleryItems.length === 0) { %>
+<div class="text-center py-16">
+  <i class="fas fa-images text-6xl text-gray-300 mb-4"></i>
+  <h3 class="text-xl font-semibold text-gray-600 mb-2">No Gallery Images</h3>
+  <p class="text-gray-500 mb-6">Start by adding your first gallery image</p>
+  <a href="/admin/gallery/create" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition inline-flex items-center">
+    <i class="fas fa-plus mr-2"></i>Add First Image
+  </a>
+</div>
+<% } %>
+
+<script>
+  // Initialize Sortable for drag-and-drop
+  const grid = document.getElementById('gallery-grid');
+  if (grid && grid.children.length > 0) {
+    new Sortable(grid, {
+      animation: 150,
+      ghostClass: 'opacity-50',
+      onEnd: function(evt) {
+        const items = [];
+        document.querySelectorAll('.gallery-item').forEach((item, index) => {
+          items.push({
+            id: item.dataset.id,
+            order: index
+          });
+        });
+        
+        // Send AJAX request to update order
+        fetch('/admin/gallery/reorder', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({ items })
+        })
+        .then(res => res.json())
+        .then(data => {
+          console.log('Order updated successfully');
+          // Optional: Show success message
+        })
+        .catch(err => {
+          console.error('Failed to update order:', err);
+          alert('Failed to update order. Please refresh the page.');
+        });
+      }
+    });
+  }
+</script>
+
+<style>
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+</style>

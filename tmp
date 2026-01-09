@@ -1,0 +1,58 @@
+now Create an admin panel using with Edge.js templating engine with the following specifications:
+- Edge.js (edge.js) templating engine
+- connect-flash for flash messages
+- tailwind  for UI
+- DataTables for table management
+- Chart.js for dashboard analytics
+
+**Features Required:**
+
+**1. Login Page (login.edge):**
+- Modern login form with username/password
+- Flash messages for errors
+- Session-based authentication
+- Redirect to dashboard on success
+
+**2. Dashboard (index.edge):**
+- Total admissions count
+- Pending admissions count
+- Total gallery images count
+- Recent 5 admissions table
+- Charts showing:
+  * Admissions by course (pie chart)
+  * Admissions by month (line chart)
+  * Category distribution (bar chart)
+
+**3. Admissions Management:**
+- list.edge: DataTable with search, sort, pagination
+  * Columns: ID, Name, Email, Phone, Course, Status, Actions
+  * Actions: View, Edit, Delete, Change Status
+  * Filter by status (pending/approved/rejected)
+  * Export to CSV/Excel
+- view.edge: Full admission details in organized sections
+  * Personal Info
+  * Parent Info
+  * Address Info
+  * Educational Qualifications
+  * Passport photo preview
+  * Status change dropdown
+- edit.edge: Pre-filled form to edit admission details
+
+**4. Gallery Management:**
+- list.edge: Grid view with image thumbnails
+  * Show: image, title, category
+  * Actions: Edit, Delete, Reorder
+  * Filter by category
+  * Drag-and-drop reordering
+- create.edge: Upload form with preview
+  * Image upload with preview
+  * Title, category, description fields
+  * Client-side validation
+- edit.edge: Edit existing gallery item
+
+**5. Layout Components:**
+- Sidebar navigation with active state
+- Top navbar with user info and logout
+- Responsive design (mobile-friendly)
+- Flash message component (success, error, info)
+
