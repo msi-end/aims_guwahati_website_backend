@@ -45,7 +45,7 @@ const createAdminUser = asyncHandler(async (req, res) => {
       username,
       email,
       password: hashedPassword,
-      role: role || "moderator", // enum value
+      role: role || "moderator", 
     },
   });
 

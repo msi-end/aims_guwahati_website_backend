@@ -12,7 +12,7 @@ const { uploadPassportMiddleware, uploadGalleryMiddleware } = require('../middle
 // Authentication routes
 router.get('/login', isGuest, adminController.showLogin);
 router.post('/login', isGuest, adminController.login);
-router.post('/signup', isGuest, adminController.createAdminUser);
+router.post('/users/create', isGuest, adminController.createAdminUser);
 router.get('/logout', isAuthenticated, adminController.logout);
 
 // Dashboard
