@@ -552,6 +552,7 @@ const updateGalleryOrder = asyncHandler(async (req, res) => {
 
 module.exports = {
   showLogin,
+  createAdminUser,
   login,
   logout,
   showDashboard,
