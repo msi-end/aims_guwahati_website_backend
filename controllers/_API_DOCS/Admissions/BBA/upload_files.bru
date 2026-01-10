@@ -1,0 +1,22 @@
+meta {
+  name: upload_files
+  type: http
+  seq: 4
+}
+
+put {
+  url: http://localhost:5000/api/admission/bba/:id
+  body: multipartForm
+  auth: inherit
+}
+
+params:path {
+  id: 
+}
+
+body:multipart-form {
+  : @file()
+  : @file()
+  : @file()
+  : @file()
+}

@@ -1,0 +1,65 @@
+meta {
+  name: create
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:5000/api/admission/bba/submit
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InN0dWRlbnQiLCJhcHBsaWNhdGlvbk5vIjoiOTg3MjcxNzM0OSIsImlhdCI6MTc2ODAzNDcxNywiZXhwIjoxNzY4MDM4MzE3fQ.KoY_lyXjsE3zMygUd8IVm2gj2RA0XWqWfepbCCZn-Bc
+}
+
+body:json {
+  {
+    "id": 101,
+    "studentId": 1,
+    "fullName": "Jane Doe",
+    "gender": "Female",
+    "dateOfBirth": "2008-05-15",
+    "category": "General",
+    "nationality": "Indian",
+    "aadhaarNumber": "1234-5678-9012",
+    "mobileNumber": "+91-9876543210",
+    "email": "jane.doe@example.com",
+    "permanentAddress": "123 Maple Street, Green Valley, Springfield",
+    "corrAddressLine": "Apt 4B, Sunrise Towers",
+    "corrState": "Maharashtra",
+    "corrDistrict": "Mumbai",
+    "corrPinCode": "400001",
+    "fatherName": "John Doe",
+    "fatherMobile": "+91-9876543211",
+    "fatherOccupation": "Engineer",
+    "fatherIncome": "12,00,000",
+    "motherName": "Mary Doe",
+    "motherMobile": "+91-9876543212",
+    "motherOccupation": "Teacher",
+    "motherIncome": "8,00,000",
+    "guardianName": null,
+    "guardianRelation": null,
+    "guardianMobile": null,
+    "guardianAddress": null,
+    "c10Board": "CBSE",
+    "c10School": "St. Mary's High School",
+    "c10Year": "2022",
+    "c10MaxMarks": "500",
+    "c10MarksObt": "475",
+    "c10Percentage": "95%",
+    "c12Board": "CBSE",
+    "c12School": "City International College",
+    "c12Year": "2024",
+    "c12MaxMarks": "500",
+    "c12MarksObt": "460",
+    "c12Percentage": "92%",
+    "passed10Plus2": "Yes",
+    "hostelRequired": "Yes",
+    "hostelType": "Double Occupancy",
+    "guardianConsent": "Yes",
+    "declaration": "true",
+    "status": "pending",
+  }
+}

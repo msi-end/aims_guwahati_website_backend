@@ -1,4 +1,4 @@
-const prisma = require("../../config/db");
+const {prisma} = require("../../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { sendSuccess, sendError } = require("../../utils/apiResponse");
@@ -84,9 +84,9 @@ exports.registerStudent = async (req, res) => {
 // POST /api/student/login
 exports.loginStudent = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { applicationNo, password } = req.body;
     const student = await prisma.student.findUnique({
-      where: { email },
+      where: { applicationNo },
     });
 
     if (!student) {

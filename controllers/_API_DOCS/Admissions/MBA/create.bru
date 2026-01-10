@@ -1,0 +1,81 @@
+meta {
+  name: create
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:5000/api/admission/mba/submit
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InN0dWRlbnQiLCJhcHBsaWNhdGlvbk5vIjoiOTg3MjcxNzM0OSIsImlhdCI6MTc2ODAzNDcxNywiZXhwIjoxNzY4MDM4MzE3fQ.KoY_lyXjsE3zMygUd8IVm2gj2RA0XWqWfepbCCZn-Bc
+}
+
+body:json {
+  {
+    "studentId": 1,
+    "firstName": "John",
+    "middleName": "Robert",
+    "lastName": "Smith",
+    "gender": "Male",
+    "dateOfBirth": "2002-11-20",
+    "bloodGroup": "O+",
+    "category": "OBC",
+    "nationality": "Indian",
+    "aadhaarNumber": "9876-5432-1100",
+    "panNumber": "ABCDE1234F",
+    "mobileNumber": "9876543210",
+    "permAddressLine1": "House No 42, Green Enclave",
+    "permCity": "Guwahati",
+    "permPostOffice": "Beltola",
+    "permPoliceStation": "Dispur",
+    "permDistrict": "Kamrup Metropolitan",
+    "permState": "Assam",
+    "permPinCode": "781028",
+    "correspondenceSameAsPermanent": true,
+    "corrAddressLine1": "House No 42, Green Enclave",
+    "corrCity": "Guwahati",
+    "corrPostOffice": "Beltola",
+    "corrPoliceStation": "Dispur",
+    "corrDistrict": "Kamrup Metropolitan",
+    "corrState": "Assam",
+    "corrPinCode": "781028",
+    "fatherName": "Robert Smith",
+    "fatherMobile": "9876543211",
+    "fatherOccupation": "Business",
+    "motherName": "Linda Smith",
+    "motherMobile": "9876543212",
+    "motherOccupation": "Homemaker",
+    "guardianName": null,
+    "guardianRelation": null,
+    "guardianMobile": null,
+    "guardianOccupation": null,
+    "guardianAddress": null,
+    "hostelRequired": "yes",
+    "hostelType": "Single Room",
+    "hostelSpecialReq": "Vegetarian meals only",
+    "qualifyingExams": "CAT, MAT",
+    "qualifyingExamOther": null,
+    "qualifyingExamScore": "95.5 percentile",
+    "degree": "B.Tech",
+    "degreeOther": null,
+    "specialisation": "Computer Science",
+    "academicRows": "[{\"exam\":\"10th\",\"board\":\"CBSE\",\"year\":\"2018\",\"percentage\":\"92\"},{\"exam\":\"12th\",\"board\":\"CBSE\",\"year\":\"2020\",\"percentage\":\"88\"}]",
+    "workExperienceRows": "[{\"company\":\"Tech Corp\",\"role\":\"Intern\",\"duration\":\"6 months\"}]",
+    "cgpa": "8.5",
+    "conversionFormula": "CGPA * 9.5",
+    "extraCurricular": "State level debate winner",
+    "hasWorkExperience": "yes",
+    "photoUrl": "https://storage.provider.com/uploads/photo_201.jpg",
+    "signatureUrl": "https://storage.provider.com/uploads/sig_201.png",
+    "marksheet10Url": "https://storage.provider.com/uploads/m10_201.pdf",
+    "marksheet12Url": "https://storage.provider.com/uploads/m12_201.pdf",
+    "marksheetGradUrl": "https://storage.provider.com/uploads/mgrad_201.pdf",
+    "casteCertificateUrl": null,
+    "declaration": "true",
+    "status": "pending"
+  }
+}

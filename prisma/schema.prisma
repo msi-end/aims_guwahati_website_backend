@@ -120,7 +120,7 @@ model MbaApplication {
   permPinCode       String? @db.VarChar(10)
 
   // Correspondence Address
-  correspondenceSameAsPermanent Boolean @default(false)
+  correspondenceSameAsPermanent String @default("false")
   corrAddressLine1              String? @db.VarChar(255)
   corrCity                      String? @db.VarChar(100)
   corrPostOffice                String? @db.VarChar(100)
@@ -173,8 +173,8 @@ model MbaApplication {
   casteCertificateUrl String? @db.VarChar(500)
 
   // --- 5. Status & Declaration ---
-  declaration Boolean  @default(false)
-  status      String   @default("pending")
+  declaration String?  @default("false")
+  status      String?   @default("pending")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }

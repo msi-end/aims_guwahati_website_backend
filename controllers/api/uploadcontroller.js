@@ -1,25 +1,36 @@
-const {prisma} = require("../../config/db");
+const { prisma } = require("../../config/db");
 const { sendSuccess, sendError } = require("../../utils/apiResponse");
 const fs = require("fs");
 
 exports.uploadDocument = async (req, res) => {
   try {
-    const { type, id } = req.params; // 'BBA' or 'MBA' and record ID
+    const { type, id } = req.params; // 'bba' or 'mba' and record ID
     const studentId = req.user.id;
 
-    if (!req.file) {
-      return sendError(res, "No file provided", null, 400);
-    }
+    // if (!req.file) {
+    //   return sendError(res, "No file provided", null, 400);
+    // }
+    const student = await prisma.student.findUnique({
+      where: { id: studentId },
+    });
+    // if (student.isFormSubmitted) {
+    //   return sendError(
+    //     res,
+    //     "You have already submitted an application.",
+    //     null,
+    //     400
+    //   );
+    // }
 
     // 1. Select Model
     const model =
-      type.toLowerCase() === "BBA"
+      type.toLowerCase() === "bba"
         ? prisma.bbaApplication
         : prisma.mbaApplication;
 
     // 2. Security Check: Does this application belong to the student?
-    const application = await model.findUnique({
-      where: { id: parseInt(id) },
+    const application = await model.findFirst({
+      where: { studentId: student.id },
     });
 
     if (!application || application.studentId !== studentId) {

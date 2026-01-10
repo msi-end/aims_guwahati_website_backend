@@ -1,0 +1,25 @@
+meta {
+  name: get info
+  type: http
+  seq: 3
+}
+
+get {
+  url: http://localhost:5000/api/admission/bba/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 1
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InN0dWRlbnQiLCJhcHBsaWNhdGlvbk5vIjoiOTg3MjcxNzM0OSIsImlhdCI6MTc2ODAzNDcxNywiZXhwIjoxNzY4MDM4MzE3fQ.KoY_lyXjsE3zMygUd8IVm2gj2RA0XWqWfepbCCZn-Bc
+}
+
+body:json {
+  {
+    "gender": "adasdf"
+  }
+}

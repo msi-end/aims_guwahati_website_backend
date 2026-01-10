@@ -1,4 +1,4 @@
-const prisma = require("../../config/db");
+const {prisma} = require("../../config/db");
 const { sendSuccess, sendError } = require("../../utils/apiResponse");
 
 exports.createMbaApplication = async (req, res) => {
@@ -96,8 +96,8 @@ exports.updateApplicationFields = async (req, res) => {
 
     // 3. Check if the record exists
     const recordId = parseInt(id);
-    const existingRecord = await targetModel.findUnique({
-      where: { id: recordId },
+    const existingRecord = await targetModel.findFirst({
+      where: { studentId: recordId },
     });
 
     if (!existingRecord) {
@@ -118,7 +118,7 @@ exports.updateApplicationFields = async (req, res) => {
     // 5. Perform the Dynamic Update
     // Prisma's 'update' only changes fields present in the 'data' object (Partial Update)
     const updatedRecord = await targetModel.update({
-      where: { id: recordId },
+      where: { id: existingRecord.id },
       data: updateData,
     });
 

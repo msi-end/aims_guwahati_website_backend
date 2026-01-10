@@ -1,7 +1,9 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
 const router = express.Router();
 const studentController = require("../../controllers/api/StudentAuthController");
 const authMiddleware = require("../../middleware/auth");
+const {sendError,sendSuccess}= require("../../utils/apiResponse")
 
 // Public Routes
 router.post("/register", studentController.registerStudent);
@@ -26,6 +28,8 @@ router.get("/me", (req, res) => {
     req.user = decoded;
     res.json(req.user);
   } catch (error) {
+    console.log(error);
+    
     return sendError(res, "Not authorized, token failed", null, 401);
   }
 });

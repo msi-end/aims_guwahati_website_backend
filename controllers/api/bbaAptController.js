@@ -99,8 +99,8 @@ exports.updateApplicationFields = async (req, res) => {
         : prisma.mbaApplication;
 
     // 3. Check if record exists
-    const existingRecord = await model.findUnique({
-      where: { id: parseInt(id) },
+    const existingRecord = await model.findFirst({
+      where: { studentId: parseInt(id) },
     });
 
     if (!existingRecord) {
@@ -122,7 +122,7 @@ exports.updateApplicationFields = async (req, res) => {
     // }
 
     const updatedRecord = await model.update({
-      where: { id: parseInt(id) },
+      where: { id: existingRecord.id },
       data: updateData,
     });
 
@@ -133,6 +133,6 @@ exports.updateApplicationFields = async (req, res) => {
     );
   } catch (error) {
     console.error("Update Error:", error);
-    return sendError(res, "Failed to update fields: " + error.message);
+    return sendError(res, "Failed to update fields: ");
   }
 };
