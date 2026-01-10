@@ -1,5 +1,5 @@
-const prisma = require("../config/db");
-const { sendSuccess, sendError } = require("../utils/apiResponse");
+const {prisma} = require("../../config/db");
+const { sendSuccess, sendError } = require("../../utils/apiResponse");
 const fs = require("fs");
 
 exports.uploadDocument = async (req, res) => {

@@ -1,4 +1,4 @@
-const prisma = require("../../config/db");
+const { prisma } = require("../../config/db");
 const { sendSuccess, sendError } = require("../../utils/apiResponse");
 const fs = require("fs");
 
@@ -82,13 +82,7 @@ exports.updateBbaApplication = async (req, res) => {
     return sendError(res, "Update failed: " + error.message);
   }
 };
-const prisma = require("../../config/db");
-const { sendSuccess, sendError } = require("../../utils/apiResponse");
 
-/**
- * Update Application Fields Dynamically
- * Supports both BBA and MBA tables based on the 'type' param
- */
 exports.updateApplicationFields = async (req, res) => {
   try {
     const { type = "bba", id } = req.params; // type: 'bba' or 'mba', id: application ID

@@ -83,7 +83,7 @@ const login = asyncHandler(async (req, res) => {
     fullName: admin.fullName,
   };
   req.flash("success", "Login successful!");
-  res.redirect("/admin/dashboard");
+  res.redirect("/admin/admissions");
 });
 const logout = asyncHandler(async (req, res) => {
   req.session.destroy((err) => {
@@ -98,129 +98,152 @@ const logout = asyncHandler(async (req, res) => {
 
 
 
-// const showDashboard = asyncHandler(async (req, res) => {
-//   // =====================
-//   // BASIC STATS
-//   // =====================
-//   const totalAdmissions = await prisma.admission.count();
-//   const pendingAdmissions = await prisma.admission.count({
-//     where: { status: "pending" },
-//   });
-//   const approvedAdmissions = await prisma.admission.count({
-//     where: { status: "approved" },
-//   });
-//   const rejectedAdmissions = await prisma.admission.count({
-//     where: { status: "rejected" },
-//   });
-//   const totalGallery = await prisma.gallery.count();
-//   // ====================
-//   // RECENT ADMISSIONS
-//   // =====================
-//   const recentAdmissions = await prisma.admission.findMany({
-//     take: 5,
-//     orderBy: { createdAt: "desc" },
-//   });
-//   // =====================
-//   // ADMISSIONS BY COURSE
-//   // =====================
-//   const admissionsByCourseRaw = await prisma.admission.groupBy({
-//     by: ["course"],
-//     _count: {
-//       course: true,
-//     },
-//   });
-//   // Sort by count DESC in JS (Prisma limitation)
-//   const admissionsByCourse = admissionsByCourseRaw
-//     .sort((a, b) => b._count.course - a._count.course)
-//     .slice(0, 6);
-//   // =====================
-//   // ADMISSIONS BY CATEGORY
-//   // =====================
-//   const admissionsByCategory = await prisma.admission.groupBy({
-//     by: ["category"],
-//     _count: {
-//       category: true,
-//     },
-//   });
-//   // =====================
-//   // ADMISSIONS BY MONTH (LAST 6 MONTHS)
-//   // =====================
-//   const sixMonthsAgo = new Date();
-//   sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
-//   const admissionsByMonth = await prisma.$queryRaw`
-//     SELECT 
-//       DATE_FORMAT(createdAt, '%Y-%m') AS month,
-//       COUNT(*) AS count
-//     FROM admissions
-//     WHERE createdAt >= ${sixMonthsAgo}
-//     GROUP BY month
-//     ORDER BY month ASC
-//   `;
+const showDashboard = asyncHandler(async (req, res) => {
+  // =====================
+  // BASIC STATS
+  // =====================
+  const totalAdmissions = await prisma.admission.count();
+  const pendingAdmissions = await prisma.admission.count({
+    where: { status: "pending" },
+  });
+  const approvedAdmissions = await prisma.admission.count({
+    where: { status: "approved" },
+  });
+  const rejectedAdmissions = await prisma.admission.count({
+    where: { status: "rejected" },
+  });
+  const totalGallery = await prisma.gallery.count();
+  // ====================
+  // RECENT ADMISSIONS
+  // =====================
+  const recentAdmissions = await prisma.admission.findMany({
+    take: 5,
+    orderBy: { createdAt: "desc" },
+  });
+  // =====================
+  // ADMISSIONS BY COURSE
+  // =====================
+  const admissionsByCourseRaw = await prisma.admission.groupBy({
+    by: ["course"],
+    _count: {
+      course: true,
+    },
+  });
+  // Sort by count DESC in JS (Prisma limitation)
+  const admissionsByCourse = admissionsByCourseRaw
+    .sort((a, b) => b._count.course - a._count.course)
+    .slice(0, 6);
+  // =====================
+  // ADMISSIONS BY CATEGORY
+  // =====================
+  const admissionsByCategory = await prisma.admission.groupBy({
+    by: ["category"],
+    _count: {
+      category: true,
+    },
+  });
+  // =====================
+  // ADMISSIONS BY MONTH (LAST 6 MONTHS)
+  // =====================
+  const sixMonthsAgo = new Date();
+  sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+  const admissionsByMonth = await prisma.$queryRaw`
+    SELECT 
+      DATE_FORMAT(createdAt, '%Y-%m') AS month,
+      COUNT(*) AS count
+    FROM admissions
+    WHERE createdAt >= ${sixMonthsAgo}
+    GROUP BY month
+    ORDER BY month ASC
+  `;
 
-//   // =====================
-//   // GALLERY BY CATEGORY
-//   // =====================
-//   const galleryByCategory = await prisma.gallery.groupBy({
-//     by: ["category"],
-//     _count: {
-//       category: true,
-//     },
-//   });
+  // =====================
+  // GALLERY BY CATEGORY
+  // =====================
+  const galleryByCategory = await prisma.gallery.groupBy({
+    by: ["category"],
+    _count: {
+      category: true,
+    },
+  });
 
-//   // =====================
-//   // RENDER
-//   // =====================
-//   res.render("admin/dashboard", {
-//     layout: "layouts/main",
-//     isAuthenticated: true,
-//     stats: {
-//       totalAdmissions,
-//       pendingAdmissions,
-//       approvedAdmissions,
-//       rejectedAdmissions,
-//       totalGallery,
-//     },
-//     recentAdmissions,
-//     admissionsByCourse: admissionsByCourse.map((item) => ({
-//       course: item.course,
-//       count: item._count.course,
-//     })),
-//     admissionsByCategory: admissionsByCategory.map((item) => ({
-//       category: item.category,
-//       count: item._count.category,
-//     })),
-//     admissionsByMonth,
-//     galleryByCategory: galleryByCategory.map((item) => ({
-//       category: item.category,
-//       count: item._count.category,
-//     })),
-//   });
-// });
+  // =====================
+  // RENDER
+  // =====================
+  res.render("admin/dashboard", {
+    layout: "layouts/main",
+    isAuthenticated: true,
+    stats: {
+      totalAdmissions,
+      pendingAdmissions,
+      approvedAdmissions,
+      rejectedAdmissions,
+      totalGallery,
+    },
+    recentAdmissions,
+    admissionsByCourse: admissionsByCourse.map((item) => ({
+      course: item.course,
+      count: item._count.course,
+    })),
+    admissionsByCategory: admissionsByCategory.map((item) => ({
+      category: item.category,
+      count: item._count.category,
+    })),
+    admissionsByMonth,
+    galleryByCategory: galleryByCategory.map((item) => ({
+      category: item.category,
+      count: item._count.category,
+    })),
+  });
+});
 const listAdmissions = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 20;
   const skip = (page - 1) * limit;
   const status = req.query.status;
   const search = req.query.search;
+  
+  // New: Identify which table to list (default to BBA if not specified)
+  const courseType = (req.query.courseType || 'BBA').toUpperCase();
+  const model = courseType === 'MBA' ? prisma.mbaApplication : prisma.bbaApplication;
 
   const where = {};
-  if (status) where.status = status.toUpperCase();
+  if (status) where.status = status; // No .toUpperCase() if your defaults are lowercase "pending"
+  
   if (search) {
-    where.OR = [
-      { studentName: { contains: search } },
-      { email: { contains: search } },
-      { phone: { contains: search } },
-    ];
+    if (courseType === 'MBA') {
+      where.OR = [
+        { firstName: { contains: search } },
+        { lastName: { contains: search } },
+        { mobileNumber: { contains: search } },
+      ];
+    } else {
+      // BBA uses 'fullName'
+      where.OR = [
+        { fullName: { contains: search } },
+        { email: { contains: search } },
+        { mobileNumber: { contains: search } },
+      ];
+    }
   }
 
+  // Fetching data and including the core Student record for the Application Number
   const [admissions, total] = await Promise.all([
-    prisma.admission.findMany({
+    model.findMany({
       where,
       skip,
       take: limit,
       orderBy: { createdAt: "desc" },
+      include: {
+        student: {
+          select: {
+            applicationNo: true,
+            email: true
+          }
+        }
+      }
     }),
-    prisma.admission.count({ where }),
+    model.count({ where }),
   ]);
 
   const totalPages = Math.ceil(total / limit);
@@ -228,11 +251,12 @@ const listAdmissions = asyncHandler(async (req, res) => {
   res.render("admin/admissions/list", {
     layout: "layouts/main",
     isAuthenticated: true,
+    courseType, // Pass this to view to change table headers
     admissions,
     currentPage: page,
     totalPages,
     total,
-    filters: { status, search },
+    filters: { status, search, courseType },
   });
 });
 const viewAdmission = asyncHandler(async (req, res) => {

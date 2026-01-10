@@ -82,8 +82,8 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // ===================
 app.use("/admin", require("./routes/admin"));
 
-app.use("/api/auth", require("./routes/api/auth"));
-app.use("/api/admissions", require("./routes/api/admissions"));
+app.use("/api/student", require("./routes/api/student"));
+app.use("/api/admission", require("./routes/api/applications"));
 app.use("/api/gallery", require("./routes/api/gallery"));
 
 app.get("/", (req, res) => res.redirect("/admin/login"));

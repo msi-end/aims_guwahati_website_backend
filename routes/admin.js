@@ -16,7 +16,7 @@ router.post('/users/create', isGuest, adminController.createAdminUser);
 router.get('/logout', isAuthenticated, adminController.logout);
 
 // Dashboard
-router.get('/', isAuthenticated, (req, res) => res.redirect('/admin/dashboard'));
+router.get('/', isAuthenticated, (req, res) => res.redirect('/admin/admissions'));
 router.get('/dashboard', isAuthenticated, adminController.showDashboard);
 
 // Admissions Management
