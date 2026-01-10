@@ -126,7 +126,7 @@ exports.updateApplicationFields = async (req, res) => {
     //     403
     //   );
     // }
-    
+
     const updatedRecord = await model.update({
       where: { id: parseInt(id) },
       data: updateData,

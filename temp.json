@@ -1,0 +1,42 @@
+// --- 1. Registration Data (Identity + Credentials) ---
+  const [regData, setRegData] = useState({
+    firstName: "", middleName: "", lastName: "",
+    gender: "", dateOfBirth: "", bloodGroup: "", category: "", nationality: "",
+    aadhaarNumber: "", panNumber: "", mobileNumber: ""
+  });
+
+  // --- 2. Family & Address Data ---
+  const [addrData, setAddrData] = useState({
+    permanentAddress: { addressLine1: "", city: "", postOffice: "", policeStation: "", district: "", state: "Assam", pinCode: "" },
+    correspondenceSameAsPermanent: false,
+    correspondenceAddress: { addressLine1: "", city: "", postOffice: "", policeStation: "", district: "", state: "Assam", pinCode: "" },
+    father: { name: "", mobile: "", occupation: "" },
+    mother: { name: "", mobile: "", occupation: "" },
+    guardian: { name: "", relation: "", mobile: "", occupation: "", address: "" },
+    hostelRequired: "no", hostelType: "", hostelSpecialReq: ""
+  });
+
+  // --- 3. Academic & Work Data ---
+  const [acadData, setAcadData] = useState({
+    qualifyingExams: [], qualifyingExamOther: "", qualifyingExamScore: "",
+    degree: "", degreeOther: "", specialisation: "",
+    academicRows: [
+      { exam: "Class 10 (HSLC)", board: "", institution: "", year: "", maxMarks: "", marksObtained: "", percentage: "" },
+      { exam: "Class 12 (HS)", board: "", institution: "", year: "", maxMarks: "", marksObtained: "", percentage: "" },
+      { exam: "Graduation", board: "", institution: "", year: "", maxMarks: "", marksObtained: "", percentage: "" }
+    ],
+    cgpa: "", conversionFormula: "",
+    extraCurricular: "",
+    hasWorkExperience: "yes",
+    workExperienceRows: [
+      // { org: 'dfwrwg', desig: 'regregre', from: '2026-02', to: '2026-06', experienceMonths: '5' }
+    ]
+  });
+
+  // --- 4. Documents Data ---
+  const [docData, setDocData] = useState({
+    photo: null, signature: null, markSheet10: null, markSheet12: null, markSheetGrad: null, casteCertificate: null
+  });
+
+  // --- 5. Declaration ---
+  const [declaration, setDeclaration] = useState(false);

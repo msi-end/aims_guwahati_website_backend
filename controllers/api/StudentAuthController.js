@@ -10,49 +10,73 @@ const generateApplicationNo = () => {
 
 exports.registerStudent = async (req, res) => {
   try {
-    const { fullName, email, mobileNumber, password } = req.body;
+    const { fullName, email, mobileNumber, password, courseType } = req.body;
 
-    // 1. Check if student already exists
     const existingStudent = await prisma.student.findFirst({
       where: {
         OR: [{ email }, { mobileNumber }],
       },
     });
     if (existingStudent) {
-      return sendError(
-        res,
-        "Email or Mobile Number already registered",
-        null,
-        400
-      );
+      return sendError(res, "Email or Mobile Number already registered", null, 400);
     }
-    // 2. Hash password
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    // 3. Generate Unique Application Number
     let applicationNo = generateApplicationNo();
-    // Ensure uniqueness (optional but recommended)
-    const checkId = await prisma.student.findUnique({
-      where: { applicationNo },
-    });
+    const checkId = await prisma.student.findUnique({ where: { applicationNo } });
     if (checkId) applicationNo = generateApplicationNo();
 
-    // 4. Create Student
-    const newStudent = await prisma.student.create({
-      data: {
-        applicationNo,
-        fullName,
-        email,
-        mobileNumber,
-        password: hashedPassword,
-        paymentStatus: "pending",
-        isFormSubmitted: false,
-      },
-    });
+    const result = await prisma.$transaction(async (tx) => {
+      // Create the Student
+      const student = await tx.student.create({
+        data: {
+          applicationNo,
+          fullName,
+          email,
+          mobileNumber,
+          password: hashedPassword,
+          selectedCourse: courseType || null, 
+        },
+      });
 
-    const { password: _, ...studentData } = newStudent;
-    return sendSuccess(res, "Registration successful", studentData, 201);
+      let applicationDetails = null;
+      if (courseType === "BBA") {
+        applicationDetails = await tx.bbaApplication.create({
+          data: {
+            studentId: student.id,
+            fullName: student.fullName,
+            email: student.email,
+            mobileNumber: student.mobileNumber,
+          },
+        });
+      } else if (courseType === "MBA") {
+        applicationDetails = await tx.mbaApplication.create({
+          data: {
+            studentId: student.id,
+            firstName: student.fullName.split(" ")[0] || "",
+            lastName: student.fullName.split(" ").slice(1).join(" ") || "",
+            mobileNumber: student.mobileNumber,
+          },
+        });
+      }
+      return { student, applicationDetails };
+    });
+    const token = jwt.sign(
+      { id: result.student.id, applicationNo: result.student.applicationNo },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    const { password: _, ...studentData } = result.student;
+
+    return sendSuccess(res, "Registration and Course Initialization successful", {
+      token,
+      student: studentData,
+      application: result.applicationDetails,
+    }, 201);
+
   } catch (error) {
+    console.error("Registration Error:", error);
     return sendError(res, error.message);
   }
 };
@@ -61,8 +85,6 @@ exports.registerStudent = async (req, res) => {
 exports.loginStudent = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // 1. Find Student by Email
     const student = await prisma.student.findUnique({
       where: { email },
     });
@@ -113,6 +135,7 @@ exports.initializeCourse = async (req, res) => {
         400
       );
     }
+
     const student = await prisma.student.findUnique({
       where: { id: studentId },
       include: {
