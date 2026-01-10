@@ -4,9 +4,7 @@ const { asyncHandler } = require("../middleware/errorHandler");
 const { deleteFile } = require("../middleware/upload");
 const path = require("path");
 
-/**
- * Show login page
- */
+
 const showLogin = asyncHandler(async (req, res) => {
   await res.render("admin/login", {
     title: "Admin Login",
@@ -14,49 +12,48 @@ const showLogin = asyncHandler(async (req, res) => {
     currentYear: new Date().getFullYear(),
   });
 });
-
-/* ===========================
-   CREATE ADMIN USER (ONE-TIME / SUPER ADMIN)
-=========================== */
 const createAdminUser = asyncHandler(async (req, res) => {
   const { username, email, password, role } = req.body;
-
   if (!username || !email || !password) {
     req.flash("error", "All fields are required");
-    return res.redirect("/admin/users/create");
+    res.status(401).json({
+      success: true,
+      message: "All fields are required",
+      data: null,
+    });
+    return;
   }
-
   // Check existing user
   const exists = await prisma.adminUser.findFirst({
     where: {
       OR: [{ username }, { email }],
     },
   });
-
   if (exists) {
     req.flash("error", "Username or email already exists");
-    return res.redirect("/admin/users/create");
+    res.status(401).json({
+      success: true,
+      message: "Username or email already exists",
+      data: null,
+    });
+    return;
   }
-
   const hashedPassword = await bcrypt.hash(password, 10);
-
   await prisma.adminUser.create({
     data: {
       username,
       email,
       password: hashedPassword,
-      role: role || "moderator", 
+      role: role || "moderator",
     },
   });
-
   req.flash("success", "Admin user created successfully");
-  res.redirect("/admin/users");
+  res.status(200).json({
+    success: true,
+    message: "Admin user created successfully",
+    data: null,
+  });
 });
-
-/**
- * Handle login
- */
-
 const login = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
   console.log(username, password);
@@ -87,10 +84,6 @@ const login = asyncHandler(async (req, res) => {
   req.flash("success", "Login successful!");
   res.redirect("/admin/dashboard");
 });
-
-/**
- * Handle logout
- */
 const logout = asyncHandler(async (req, res) => {
   req.session.destroy((err) => {
     if (err) {
@@ -99,6 +92,10 @@ const logout = asyncHandler(async (req, res) => {
     res.redirect("/admin/login");
   });
 });
+
+
+
+
 
 const showDashboard = asyncHandler(async (req, res) => {
   // =====================
@@ -198,10 +195,6 @@ const showDashboard = asyncHandler(async (req, res) => {
     })),
   });
 });
-
-/**
- * List all admissions
- */
 const listAdmissions = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 20;
@@ -241,10 +234,6 @@ const listAdmissions = asyncHandler(async (req, res) => {
     filters: { status, search },
   });
 });
-
-/**
- * View single admission
- */
 const viewAdmission = asyncHandler(async (req, res) => {
   const admission = await prisma.admission.findUnique({
     where: { id: parseInt(req.params.id) },
@@ -257,10 +246,6 @@ const viewAdmission = asyncHandler(async (req, res) => {
 
   res.render("admin/admissions/view", { admission });
 });
-
-/**
- * Show edit admission form
- */
 const editAdmissionForm = asyncHandler(async (req, res) => {
   const admission = await prisma.admission.findUnique({
     where: { id: parseInt(req.params.id) },
@@ -273,10 +258,6 @@ const editAdmissionForm = asyncHandler(async (req, res) => {
 
   res.render("admin/admissions/edit", { admission });
 });
-
-/**
- * Update admission
- */
 const updateAdmission = asyncHandler(async (req, res) => {
   const id = parseInt(req.params.id);
   const {
@@ -331,10 +312,6 @@ const updateAdmission = asyncHandler(async (req, res) => {
   req.flash("success", "Admission updated successfully");
   res.redirect(`/admin/admissions/${id}`);
 });
-
-/**
- * Delete admission
- */
 const deleteAdmission = asyncHandler(async (req, res) => {
   const id = parseInt(req.params.id);
 
@@ -356,10 +333,6 @@ const deleteAdmission = asyncHandler(async (req, res) => {
   req.flash("success", "Admission deleted successfully");
   res.redirect("/admin/admissions");
 });
-
-/**
- * Update admission status
- */
 const updateStatus = asyncHandler(async (req, res) => {
   const id = parseInt(req.params.id);
   const { status, admin_notes } = req.body;
@@ -376,12 +349,10 @@ const updateStatus = asyncHandler(async (req, res) => {
   res.redirect(`/admin/admissions/${id}`);
 });
 
-/**
- * List gallery items
- */
-/**
- * List Gallery Items
- */
+
+
+
+
 const listGallery = asyncHandler(async (req, res) => {
   const category = req.query.category;
   const where = category ? { category: category.toUpperCase() } : {};
@@ -414,20 +385,12 @@ const listGallery = asyncHandler(async (req, res) => {
     currentPath: req.path, // ✅ for sidebar active state
   });
 });
-
-/**
- * Show create gallery form
- */
 const createGalleryForm = asyncHandler(async (req, res) => {
   res.render("admin/gallery/create", {
     layout: "layouts/main",
     isAuthenticated: true,
   });
 });
-
-/**
- * Create gallery item
- */
 const createGallery = asyncHandler(async (req, res) => {
   if (!req.file) {
     req.flash("error", "Image is required");
@@ -448,10 +411,6 @@ const createGallery = asyncHandler(async (req, res) => {
   req.flash("success", "Gallery item created successfully");
   res.redirect("/admin/gallery");
 });
-
-/**
- * Show edit gallery form
- */
 const editGalleryForm = asyncHandler(async (req, res) => {
   const item = await prisma.gallery.findUnique({
     where: { id: parseInt(req.params.id) },
@@ -468,10 +427,6 @@ const editGalleryForm = asyncHandler(async (req, res) => {
     item,
   });
 });
-
-/**
- * Update gallery item
- */
 const updateGallery = asyncHandler(async (req, res) => {
   const id = parseInt(req.params.id);
   const existing = await prisma.gallery.findUnique({
@@ -507,10 +462,6 @@ const updateGallery = asyncHandler(async (req, res) => {
   req.flash("success", "Gallery item updated successfully");
   res.redirect("/admin/gallery");
 });
-
-/**
- * Delete gallery item
- */
 const deleteGallery = asyncHandler(async (req, res) => {
   const id = parseInt(req.params.id);
   const item = await prisma.gallery.findUnique({
@@ -531,10 +482,6 @@ const deleteGallery = asyncHandler(async (req, res) => {
   req.flash("success", "Gallery item deleted successfully");
   res.redirect("/admin/gallery");
 });
-
-/**
- * Update gallery order (AJAX)
- */
 const updateGalleryOrder = asyncHandler(async (req, res) => {
   const { items } = req.body;
 
@@ -549,6 +496,9 @@ const updateGalleryOrder = asyncHandler(async (req, res) => {
 
   res.json({ success: true });
 });
+
+
+
 
 module.exports = {
   showLogin,

@@ -1,58 +1,95 @@
-now Create an admin panel using with Edge.js templating engine with the following specifications:
-- Edge.js (edge.js) templating engine
-- connect-flash for flash messages
-- tailwind  for UI
-- DataTables for table management
-- Chart.js for dashboard analytics
+  
+  Students_table :
+    Full Name
+    Email Address
+    Mobile Number
+    Password
 
-**Features Required:**
 
-**1. Login Page (login.edge):**
-- Modern login form with username/password
-- Flash messages for errors
-- Session-based authentication
-- Redirect to dashboard on success
+  Application_bba :
+    // A. Applicant Details 
+    fullName: "",
+    gender: "Male",
+    dateOfBirth: "",
+    category: "General",
+    nationality: "Indian",
+    aadhaarNumber: "",
+    mobileNumber: "",
+    email: "",
 
-**2. Dashboard (index.edge):**
-- Total admissions count
-- Pending admissions count
-- Total gallery images count
-- Recent 5 admissions table
-- Charts showing:
-  * Admissions by course (pie chart)
-  * Admissions by month (line chart)
-  * Category distribution (bar chart)
+    // Address Details 
+    permanentAddress: "",
+    correspondenceAddress: {
+      addressLine: "",
+      state: "",
+      district: "",
+      pinCode: ""
+    },
+    
+    // B. Parent Details 
+    father: { name: "", mobile: "", occupation: "", annualIncome: "" },
+    mother: { name: "", mobile: "", occupation: "", annualIncome: "" },
 
-**3. Admissions Management:**
-- list.edge: DataTable with search, sort, pagination
-  * Columns: ID, Name, Email, Phone, Course, Status, Actions
-  * Actions: View, Edit, Delete, Change Status
-  * Filter by status (pending/approved/rejected)
-  * Export to CSV/Excel
-- view.edge: Full admission details in organized sections
-  * Personal Info
-  * Parent Info
-  * Address Info
-  * Educational Qualifications
-  * Passport photo preview
-  * Status change dropdown
-- edit.edge: Pre-filled form to edit admission details
+    // C. Guardian Details 
+    guardian: { name: "", relationship: "", mobile: "", occupation: "", address: "" },
 
-**4. Gallery Management:**
-- list.edge: Grid view with image thumbnails
-  * Show: image, title, category
-  * Actions: Edit, Delete, Reorder
-  * Filter by category
-  * Drag-and-drop reordering
-- create.edge: Upload form with preview
-  * Image upload with preview
-  * Title, category, description fields
-  * Client-side validation
-- edit.edge: Edit existing gallery item
+    // D. Academic Qualifications 
+    class10: { board: "", school: "", year: "", maxMarks: "", marksObt: "", percentage: "" },
+    class12: { board: "", school: "", year: "", maxMarks: "", marksObt: "", percentage: "" },
+    otherQual: { exam: "", board: "", school: "", year: "", maxMarks: "", marksObt: "", percentage: "" },
+    
+    // E. Eligibility 
+    passed10Plus2: false,
+    meetsEligibility: false,
 
-**5. Layout Components:**
-- Sidebar navigation with active state
-- Top navbar with user info and logout
-- Responsive design (mobile-friendly)
-- Flash message component (success, error, info)
+    // F. Hostel 
+    hostelRequired: "No",
+    hostelType: "Boys Hostel",
+    expectedJoinDate: "",
+    specialRequirement: "",
+    guardianConsent: "No",
 
+    // H. Declaration 
+    declarationSigned: false
+
+
+
+  Application_mba: 
+
+    // Applicant Details 
+    firstName: "", middleName: "", lastName: "",
+    gender: "", dateOfBirth: "", bloodGroup: "", category: "", nationality: "",
+    aadhaarNumber: "", panNumber: "", mobileNumber: ""
+
+    // Address Details 
+    permanentAddress: { addressLine1: "", city: "", postOffice: "", policeStation: "", district: "", state: "Assam", pinCode: "" },
+    correspondenceSameAsPermanent: false,
+    correspondenceAddress: { addressLine1: "", city: "", postOffice: "", policeStation: "", district: "", state: "Assam", pinCode: "" },
+
+    //  Parent Details 
+    father: { name: "", mobile: "", occupation: "" },
+    mother: { name: "", mobile: "", occupation: "" },
+
+    // Guardian Details 
+    guardian: { name: "", relation: "", mobile: "", occupation: "", address: "" },
+    hostelRequired: "no", hostelType: "", hostelSpecialReq: ""
+
+    // Academic Qualifications 
+    qualifyingExams: [], qualifyingExamOther: "", qualifyingExamScore: "",
+    degree: "", degreeOther: "", specialisation: "",
+    academicRows: [
+      { exam: "Class 10 (HSLC)", board: "", institution: "", year: "", maxMarks: "", marksObtained: "", percentage: "" },
+      { exam: "Class 12 (HS)", board: "", institution: "", year: "", maxMarks: "", marksObtained: "", percentage: "" },
+      { exam: "Graduation", board: "", institution: "", year: "", maxMarks: "", marksObtained: "", percentage: "" }
+    ],
+    cgpa: "", conversionFormula: "",
+    extraCurricular: "",
+    hasWorkExperience: "yes",
+    workExperienceRows: [
+      // { org: 'dfwrwg', desig: 'regregre', from: '2026-02', to: '2026-06', experienceMonths: '5' }
+    ]
+
+
+    photo: null, signature: null, markSheet10: null, markSheet12: null, markSheetGrad: null, casteCertificate: null
+
+    declaration: true
