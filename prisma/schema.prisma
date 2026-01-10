@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -8,65 +7,161 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Admission {
-  id                                  Int             @id @default(autoincrement())
-  fullName                            String          @db.VarChar(255)
-  email                               String          @unique @db.VarChar(255)
-  phoneNumber                         String          @db.VarChar(15)
-  course                              String          @db.Text
-  dateOfBirth                         DateTime        @db.Date
-  category                            Category
-  
-  // Parental Details
-  fatherName                          String          @db.VarChar(255)
-  fatherOccupation                    String?         @db.VarChar(100)
-  fatherPhoneNumber                   String?         @db.VarChar(15)
-  motherName                          String          @db.VarChar(255)
-  motherOccupation                    String?         @db.VarChar(100)
-  motherPhoneNumber                   String?         @db.VarChar(15)
-  
-  // Address Details
-  addressLine1                        String          @db.Text
-  addressLine2                        String?         @db.Text
-  state                               String          @db.VarChar(100)
-  district                            String          @db.VarChar(100)
-  pinCode                             String          @db.VarChar(10)
-  
-  // Academic Records
-  passportPhotograph                  String?         @db.VarChar(255)
-  qualifyingExamAppeared              String?         @db.VarChar(100)
-  qualifyingExamPercentageOrPercentile String?        @db.VarChar(50)
-  graduationDiscipline                String?         @db.VarChar(100)
-  graduationOtherDisciplineDetails    String?         @db.Text
-  graduationSpecialisation            String?         @db.VarChar(100)
-  otherQualification                  String?         @db.Text
-  postGraduationDegree                String?         @db.VarChar(100)
-  
-  // Grades
-  percentageMarksClass10              Decimal?        @db.Decimal(5, 2)
-  class12Stream                       Stream?
-  percentageMarksClass12              Decimal?        @db.Decimal(5, 2)
-  percentageMarksGraduation           Decimal?        @db.Decimal(5, 2)
-  percentageMarksPostGraduation       Decimal?        @db.Decimal(5, 2)
-  
-  // Metadata
-  status                              AdmissionStatus @default(pending)
-  createdAt                           DateTime        @default(now())
-  updatedAt                           DateTime        @updatedAt
+// 1. Core Student / User Table
+model Student {
+  id            Int    @id @default(autoincrement())
+  applicationNo String @unique @db.VarChar(10) // The 10-digit ID
+  fullName      String @db.VarChar(255)
+  email         String @unique @db.VarChar(255)
+  mobileNumber  String @unique @db.VarChar(15)
+  password      String @db.VarChar(255)
 
-  @@map("admissions")
+  // Tracking Fields
+  createdAt       DateTime         @default(now())
+  paymentStatus   String           @default("pending") // "pending", "paid", "failed"
+  isFormSubmitted Boolean          @default(false)
+  selectedCourse  String? // "BBA" or "MBA"
+  // Relationships
+  bbaApplications BbaApplication[]
+  mbaApplications MbaApplication[]
 }
 
+// 2. BBA Application Table (Flattened)
+model BbaApplication {
+  id        Int     @id @default(autoincrement())
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [id])
+
+  // Applicant Details
+  fullName      String @db.VarChar(255)
+  gender        String @db.VarChar(20)
+  dateOfBirth   String @db.VarChar(50)
+  category      String @db.VarChar(50)
+  nationality   String @db.VarChar(50)
+  aadhaarNumber String @db.VarChar(20)
+  mobileNumber  String @db.VarChar(15)
+  email         String @db.VarChar(255)
+
+  // Address
+  permanentAddress String @db.Text
+  corrAddressLine  String @db.VarChar(255)
+  corrState        String @db.VarChar(100)
+  corrDistrict     String @db.VarChar(100)
+  corrPinCode      String @db.VarChar(10)
+
+  // Parents/Guardian
+  fatherName       String
+  fatherMobile     String
+  fatherOccupation String
+  fatherIncome     String
+  motherName       String
+  motherMobile     String
+  motherOccupation String
+  motherIncome     String
+  guardianName     String
+  guardianRelation String
+  guardianMobile   String
+  guardianAddress  String @db.Text
+
+  // Academics
+  c10Board      String
+  c10School     String
+  c10Year       String
+  c10MaxMarks   String
+  c10MarksObt   String
+  c10Percentage String
+
+  c12Board      String
+  c12School     String
+  c12Year       String
+  c12MaxMarks   String
+  c12MarksObt   String
+  c12Percentage String
+
+  // Eligibility & Hostel
+  passed10Plus2   String  @default("No")
+  hostelRequired  String  @default("No")
+  hostelType      String?
+  guardianConsent String  @default("No")
+
+  declaration String   @default("false")
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+}
+
+// 3. MBA Application Table (Flattened)
+model MbaApplication {
+  id        Int     @id @default(autoincrement())
+  studentId Int
+  student   Student @relation(fields: [studentId], references: [id])
+
+  // Applicant Details
+  firstName     String  @db.VarChar(100)
+  middleName    String? @db.VarChar(100)
+  lastName      String  @db.VarChar(100)
+  gender        String  @db.VarChar(20)
+  dateOfBirth   String  @db.VarChar(50)
+  bloodGroup    String  @db.VarChar(10)
+  category      String  @db.VarChar(50)
+  aadhaarNumber String  @db.VarChar(20)
+  panNumber     String  @db.VarChar(20)
+  mobileNumber  String  @db.VarChar(15)
+
+  // Address
+  permAddressLine1 String @db.VarChar(255)
+  permCity         String @db.VarChar(100)
+  permDistrict     String @db.VarChar(100)
+  permState        String @db.VarChar(100)
+  permPinCode      String @db.VarChar(10)
+
+  // Academic Details
+  qualifyingExams String? @db.Text // Comma separated list
+  examScore       String?
+  degree          String
+  specialisation  String
+
+  c10Board String
+  c10Inst  String
+  c10Year  String
+  c10Marks String
+
+  c12Board String
+  c12Inst  String
+  c12Year  String
+  c12Marks String
+
+  gradBoard String
+  gradInst  String
+  gradYear  String
+  gradMarks String
+
+  // Work Exp (Stored as Stringified JSON or Text block)
+  hasWorkExp     String  @default("no")
+  workExpDetails String? @db.Text
+
+  // Documents (URLs)
+  photoUrl         String? @db.VarChar(500)
+  signatureUrl     String? @db.VarChar(500)
+  marksheet10Url   String? @db.VarChar(500)
+  marksheetGradUrl String? @db.VarChar(500)
+
+  declaration String   @default("false")
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+}
+
+// --- Your Original Admin & Gallery Models ---
+
 model Gallery {
-  id           Int             @id @default(autoincrement())
-  image        String          @db.VarChar(500)
-  title        String          @db.VarChar(255)
-  category     String          @db.VarChar(50)
-  description  String?         @db.Text
-  displayOrder Int             @default(0)
-  isActive     Boolean         @default(true)
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  id           Int      @id @default(autoincrement())
+  image        String   @db.VarChar(500)
+  title        String   @db.VarChar(255)
+  category     String   @db.VarChar(50)
+  description  String?  @db.Text
+  displayOrder Int      @default(0)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
   @@map("gallery")
 }
@@ -76,36 +171,11 @@ model AdminUser {
   username  String    @unique @db.VarChar(100)
   email     String    @unique @db.VarChar(255)
   password  String    @db.VarChar(255)
-  role      AdminRole @default(moderator)
+  role      String    @default("moderator")
   isActive  Boolean   @default(true)
   lastLogin DateTime?
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
   @@map("admin_users")
-}
-
-// Enums
-enum Category {
-  General
-  OBC
-  SC
-  ST
-}
-
-enum Stream {
-  Science
-  Commerce
-  Arts
-}
-
-enum AdmissionStatus {
-  pending
-  approved
-  rejected
-}
-
-enum AdminRole {
-  admin
-  moderator
 }
