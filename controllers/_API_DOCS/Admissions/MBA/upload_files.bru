@@ -19,5 +19,6 @@ auth:bearer {
 }
 
 body:multipart-form {
-  photoUrl: @file(C:\Users\BS\Pictures\1.png)
+  photoUrl: @file(C:\Users\BS\Pictures\1.png) @contentType(jpg/png)
+  signatureUrl: @file(C:\Users\BS\Pictures\6.png)
 }

@@ -2,75 +2,58 @@ const { prisma } = require("../../config/db");
 const { sendSuccess, sendError } = require("../../utils/apiResponse");
 const fs = require("fs");
 
-exports.uploadDocument = async (req, res) => {
+exports.uploadDocuments = async (req, res) => {
   try {
-    const { type, id } = req.params; // 'bba' or 'mba' and record ID
+    if (!req.files || req.files.length === 0) {
+      return sendError(res, "No files uploaded", null, 400);
+    }
+    const { type } = req.params;
     const studentId = req.user.id;
-
-    // if (!req.file) {
-    //   return sendError(res, "No file provided", null, 400);
-    // }
-    const student = await prisma.student.findUnique({
-      where: { id: studentId },
-    });
-    // if (student.isFormSubmitted) {
-    //   return sendError(
-    //     res,
-    //     "You have already submitted an application.",
-    //     null,
-    //     400
-    //   );
-    // }
-
-    // 1. Select Model
     const model =
       type.toLowerCase() === "bba"
         ? prisma.bbaApplication
         : prisma.mbaApplication;
 
-    // 2. Security Check: Does this application belong to the student?
     const application = await model.findFirst({
-      where: { studentId: student.id },
+      where: { studentId },
     });
 
-    if (!application || application.studentId !== studentId) {
-      // Clean up the uploaded file if unauthorized
-      if (req.file) fs.unlinkSync(req.file.path);
+    if (!application) {
+      req.files.forEach((f) => fs.unlinkSync(f.path));
       return sendError(res, "Unauthorized or record not found", null, 403);
     }
 
-    // 3. Dynamic Field Mapping
-    // fieldname comes from the frontend FormData key (e.g., 'photoUrl')
-    const fieldName = req.file.fieldname;
-    const filePath = req.file.path;
+    const updateData = {};
 
-    // 4. Delete old file if it exists (Cleanup disk space)
-    if (application[fieldName] && fs.existsSync(application[fieldName])) {
-      try {
+    for (const file of req.files) {
+      const fieldName = file.fieldname;
+      const filePath = file.path;
+      if (application[fieldName] && fs.existsSync(application[fieldName])) {
         fs.unlinkSync(application[fieldName]);
-      } catch (err) {
-        console.error("Old file deletion failed:", err);
       }
+
+      updateData[fieldName] = filePath;
     }
 
-    const updated = await model.update({
-      where: { id: parseInt(id) },
-      data: { [fieldName]: filePath },
+    await model.update({
+      where: { id: application.id },
+      data: updateData,
     });
 
-    return sendSuccess(res, "Document uploaded successfully", {
-      field: fieldName,
-      url: filePath,
-    });
+    return sendSuccess(res, "Documents uploaded successfully", updateData);
   } catch (error) {
-    if (req.file) fs.unlinkSync(req.file.path);
+    if (req.files) {
+      req.files.forEach((f) => {
+        if (fs.existsSync(f.path)) fs.unlinkSync(f.path);
+      });
+    }
     return sendError(res, error.message);
   }
 };
 
 exports.deleteDocument = async (req, res) => {
   try {
-    const { type, id } = req.params; // 'BBA' or 'MBA' and record ID
+    const { type, id } = req.params; // 'bba' or 'mba' and record ID
     const { fieldName } = req.body; // e.g., 'photoUrl' or 'marksheet10Url'
     const studentId = req.user.id;
 
@@ -87,24 +70,17 @@ exports.deleteDocument = async (req, res) => {
     if (!application || application.studentId !== studentId) {
       return sendError(res, "Unauthorized or record not found", null, 403);
     }
-
-    // 3. Check if the field actually contains a file path
     const filePath = application[fieldName];
     if (!filePath) {
       return sendError(res, "No file found for this field", null, 404);
     }
-
-    // 4. Physically delete the file from the 'uploads/' folder
     if (fs.existsSync(filePath)) {
       try {
         fs.unlinkSync(filePath);
       } catch (err) {
         console.error("Physical file deletion failed:", err);
-        // We continue to update the database even if the physical file is missing
       }
     }
-
-    // 5. Update Database to set the field back to null
     await model.update({
       where: { id: parseInt(id) },
       data: { [fieldName]: null },

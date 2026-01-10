@@ -21,7 +21,7 @@ router.put("/mba/update/:id", authMiddleware, mbaController.updateApplicationFie
 
 // ---Works On both BBA & MBA.  ---
 
-router.put('/upload/:type/:id', authMiddleware, upload.any(), uploadController.uploadDocument);
+router.put('/upload/:type/:id', authMiddleware, upload.any(), uploadController.uploadDocuments);
 router.delete('/delete/:type/:id', authMiddleware, uploadController.deleteDocument);
 
 module.exports = router;
