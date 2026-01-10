@@ -36,4 +36,5 @@ router.post('/gallery/:id/update', isAuthenticated, uploadGalleryMiddleware, adm
 router.post('/gallery/:id/delete', isAuthenticated, adminController.deleteGallery);
 router.post('/gallery/reorder', isAuthenticated, adminController.updateGalleryOrder);
 
+
 module.exports = router;
