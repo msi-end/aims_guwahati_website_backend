@@ -111,6 +111,7 @@ exports.loginStudent = async (req, res) => {
       student: {
         id: student.id,
         applicationNo: student.applicationNo,
+        courseType: student.selectedCourse,
         fullName: student.fullName,
         paymentStatus: student.paymentStatus,
         isFormSubmitted: student.isFormSubmitted,
