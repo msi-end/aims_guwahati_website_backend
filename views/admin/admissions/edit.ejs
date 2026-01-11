@@ -1,172 +1,129 @@
 <% 
+  const isMba = !!admission.firstName;
+  const displayName = isMba ? `${admission.firstName} ${admission.lastName}` : admission.fullName;
   const title = 'Edit Admission';
   const pageTitle = 'Edit Admission';
-  const pageDescription = `Editing admission for ${admission.studentName}`;
+  const pageDescription = `Editing ${isMba ? 'MBA' : 'BBA'} application for ${displayName}`;
 %>
 
-<div class="max-w-4xl mx-auto">
-  
-  <!-- Back Button -->
-  <a href="/admin/admissions/<%= admission.id %>" class="inline-flex items-center text-blue-600 hover:text-blue-700 mb-6">
+<div class="max-w-5xl mx-auto pb-10">
+  <a href="/admin/admissions/<%= isMba ? 'mba' : 'bba' %>/<%= admission.id %>" class="inline-flex items-center text-blue-600 hover:text-blue-700 mb-6 font-medium">
     <i class="fas fa-arrow-left mr-2"></i>Back to Details
   </a>
-  
-  <form action="/admin/admissions/<%= admission.id %>/update" method="POST" enctype="multipart/form-data" class="space-y-6">
+
+  <form action="/admin/admissions/<%= isMba ? 'mba' : 'bba' %>/<%= admission.id %>/update" method="POST" enctype="multipart/form-data" class="space-y-8">
     
-    <!-- Personal Information -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+    <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
       <div class="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
-        <h3 class="text-xl font-bold text-white">Personal Information</h3>
+        <h3 class="text-lg font-bold text-white"><i class="fas fa-user-circle mr-2"></i>Personal Information</h3>
       </div>
-      <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="p-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Student Name *</label>
-          <input type="text" name="student_name" value="<%= admission.studentName %>" required
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-        </div>
-        
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Date of Birth *</label>
-          <input type="date" name="date_of_birth" value="<%= admission.dateOfBirth.toISOString().split('T')[0] %>" required
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-        </div>
-        
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Gender *</label>
-          <select name="gender" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-            <option value="MALE" <%= admission.gender === 'MALE' ? 'selected' : '' %>>Male</option>
-            <option value="FEMALE" <%= admission.gender === 'FEMALE' ? 'selected' : '' %>>Female</option>
-            <option value="OTHER" <%= admission.gender === 'OTHER' ? 'selected' : '' %>>Other</option>
-          </select>
-        </div>
-        
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Class Applying *</label>
-          <input type="text" name="class_applying" value="<%= admission.classApplying %>" required
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-        </div>
-        
-      </div>
-    </div>
-    
-    <!-- Contact Information -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-      <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
-        <h3 class="text-xl font-bold text-white">Contact Information</h3>
-      </div>
-      <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-          <input type="email" name="email" value="<%= admission.email || '' %>"
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-        </div>
-        
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Phone *</label>
-          <input type="tel" name="phone" value="<%= admission.phone %>" required
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-        </div>
-        
-        <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Address *</label>
-          <textarea name="address" rows="3" required
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"><%= admission.address %></textarea>
-        </div>
-        
-      </div>
-    </div>
-    
-    <!-- Parent Information -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-      <div class="bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-4">
-        <h3 class="text-xl font-bold text-white">Parent Information</h3>
-      </div>
-      <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-        
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Father's Name *</label>
-          <input type="text" name="father_name" value="<%= admission.fatherName %>" required
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-        </div>
-        
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Mother's Name *</label>
-          <input type="text" name="mother_name" value="<%= admission.motherName %>" required
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-        </div>
-        
-      </div>
-    </div>
-    
-    <!-- Educational Background -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-      <div class="bg-gradient-to-r from-yellow-600 to-yellow-700 px-6 py-4">
-        <h3 class="text-xl font-bold text-white">Educational Background</h3>
-      </div>
-      <div class="p-6">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Previous School</label>
-          <input type="text" name="previous_school" value="<%= admission.previousSchool || '' %>"
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-        </div>
-      </div>
-    </div>
-    
-    <!-- Passport Photo -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-      <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4">
-        <h3 class="text-xl font-bold text-white">Passport Photo</h3>
-      </div>
-      <div class="p-6">
-        <% if (admission.passportPhoto) { %>
-        <div class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Current Photo</label>
-          <img src="<%= admission.passportPhoto %>" alt="Current Photo" class="w-32 h-32 object-cover rounded-lg border-2 border-gray-200">
-        </div>
+        <% if (isMba) { %>
+          <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">First Name</label>
+            <input type="text" name="firstName" value="<%= admission.firstName %>" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Middle Name</label>
+            <input type="text" name="middleName" value="<%= admission.middleName %>" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Last Name</label>
+            <input type="text" name="lastName" value="<%= admission.lastName %>" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+          </div>
+        <% } else { %>
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Full Name</label>
+            <input type="text" name="fullName" value="<%= admission.fullName %>" required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+          </div>
         <% } %>
+
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Upload New Photo (Optional)</label>
-          <input type="file" name="passport_photo" accept="image/jpeg,image/jpg,image/png"
-                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-          <p class="text-xs text-gray-500 mt-1">JPG, JPEG, PNG only. Max 5MB.</p>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Date of Birth</label>
+          <input type="text" name="dateOfBirth" value="<%= admission.dateOfBirth %>" placeholder="DD-MM-YYYY" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
         </div>
-      </div>
-    </div>
-    
-    <!-- Admin Notes & Status -->
-    <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-      <div class="bg-gradient-to-r from-red-600 to-red-700 px-6 py-4">
-        <h3 class="text-xl font-bold text-white">Status & Admin Notes</h3>
-      </div>
-      <div class="p-6 space-y-4">
+
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-          <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
-            <option value="PENDING" <%= admission.status === 'PENDING' ? 'selected' : '' %>>Pending</option>
-            <option value="APPROVED" <%= admission.status === 'APPROVED' ? 'selected' : '' %>>Approved</option>
-            <option value="REJECTED" <%= admission.status === 'REJECTED' ? 'selected' : '' %>>Rejected</option>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Gender</label>
+          <select name="gender" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            <option value="Male" <%= admission.gender === 'Male' ? 'selected' : '' %>>Male</option>
+            <option value="Female" <%= admission.gender === 'Female' ? 'selected' : '' %>>Female</option>
+            <option value="Other" <%= admission.gender === 'Other' ? 'selected' : '' %>>Other</option>
           </select>
         </div>
+
         <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Admin Notes</label>
-          <textarea name="admin_notes" rows="4"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"><%= admission.adminNotes || '' %></textarea>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Blood Group</label>
+          <input type="text" name="bloodGroup" value="<%= admission.bloodGroup %>" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
         </div>
       </div>
     </div>
-    
-    <!-- Actions -->
-    <div class="flex space-x-4">
-      <button type="submit" class="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">
-        <i class="fas fa-save mr-2"></i>Save Changes
+
+    <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+      <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+        <h3 class="text-lg font-bold text-white"><i class="fas fa-address-book mr-2"></i>Family & Contact</h3>
+      </div>
+      <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Father's Name</label>
+          <input type="text" name="fatherName" value="<%= admission.fatherName %>" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Mother's Name</label>
+          <input type="text" name="motherName" value="<%= admission.motherName %>" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Mobile Number</label>
+          <input type="tel" name="mobileNumber" value="<%= admission.mobileNumber %>" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Email</label>
+          <input type="email" name="email" value="<%= admission.email || admission.student?.email %>" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+        </div>
+
+        <% if (isMba) { %>
+          <div class="md:col-span-2">
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Permanent Address</label>
+            <textarea name="permAddressLine1" rows="2" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"><%= admission.permAddressLine1 %></textarea>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-md overflow-hidden border border-gray-200">
+      <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 px-6 py-4 text-white">
+        <h3 class="text-lg font-bold">Profile Media</h3>
+      </div>
+      <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="flex items-start space-x-4">
+          <% if (admission.photoUrl) { %>
+            <img src="/<%= admission.photoUrl %>" class="w-24 h-24 object-cover rounded border">
+          <% } %>
+          <div class="flex-1">
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Update Photo</label>
+            <input type="file" name="photo" class="text-sm">
+          </div>
+        </div>
+        <div class="flex items-start space-x-4">
+          <% if (admission.signatureUrl) { %>
+            <img src="/<%= admission.signatureUrl %>" class="w-24 h-12 object-contain bg-gray-50 border rounded">
+          <% } %>
+          <div class="flex-1">
+            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Update Signature</label>
+            <input type="file" name="signature" class="text-sm">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center space-x-4">
+      <button type="submit" class="px-8 py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 shadow-lg transition">
+        <i class="fas fa-save mr-2"></i>Update Application
       </button>
-      <a href="/admin/admissions/<%= admission.id %>" class="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition">
-        <i class="fas fa-times mr-2"></i>Cancel
+      <a href="/admin/admissions/<%= isMba ? 'mba' : 'bba' %>/<%= admission.id %>" class="px-8 py-3 bg-white text-gray-600 border rounded-lg hover:bg-gray-50">
+        Cancel
       </a>
     </div>
-    
   </form>
-  
 </div>

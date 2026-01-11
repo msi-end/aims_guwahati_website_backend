@@ -21,11 +21,11 @@ router.get('/dashboard', isAuthenticated, adminController.showDashboard);
 
 // Admissions Management
 router.get('/admissions', isAuthenticated, adminController.listAdmissions);
-router.get('/admissions/:id', isAuthenticated, adminController.viewAdmission);
-router.get('/admissions/:id/edit', isAuthenticated, adminController.editAdmissionForm);
+router.get('/admissions/:courseType/:id', isAuthenticated, adminController.viewAdmission);
+router.get('/admissions/:courseType/:id/edit', isAuthenticated, adminController.editAdmissionForm);
 router.post('/admissions/:id/update', isAuthenticated, uploadPassportMiddleware, adminController.updateAdmission);
-router.post('/admissions/:id/delete', isAuthenticated, adminController.deleteAdmission);
-router.post('/admissions/:id/status', isAuthenticated, adminController.updateStatus);
+router.post('/admissions/:courseType/:id/delete', isAuthenticated, adminController.deleteAdmission);
+router.post('/admissions/:courseType/:id/status', isAuthenticated, adminController.updateStatus);
 
 // Gallery Management
 router.get('/gallery', isAuthenticated, adminController.listGallery);

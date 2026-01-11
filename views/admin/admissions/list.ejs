@@ -65,7 +65,7 @@
           <% 
              // Handle name difference between BBA (fullName) and MBA (firstName + lastName)
              const displayName = admission.fullName || (admission.firstName + ' ' + (admission.lastName || ''));
-             const displayEmail = admission.email || admission.student?.email;
+             const displayEmail = admission.email || admission.student?.email || 'N/A';
           %>
         <tr>
           <td class="font-mono text-sm text-blue-600 font-bold">
@@ -78,7 +78,7 @@
               </div>
               <div class="flex flex-col">
                 <span class="font-semibold text-gray-900"><%= displayName %></span>
-                <span class="text-xs text-gray-500"><%= admission.category %> | <%= admission.gender %></span>
+                <span class="text-xs text-gray-500"><%= admission.category? admission.category: 'N/A' %> | <%= admission.gender? admission.gender: 'N/A' %></span>
               </div>
             </div>
           </td>
@@ -113,7 +113,7 @@
               </button>
               
               <div class="relative group">
-                <button class="text-gray-400 hover:text-gray-600"><i class="fas fa-ellipsis-v"></i></button>
+                <button class="text-gray-400 w-8 hover:text-gray-600"><i class="fas fa-ellipsis-v"></i></button>
                 <div class="hidden group-hover:block absolute right-0 w-32 bg-white border rounded shadow-xl z-50">
                    <button onclick="changeStatus(<%= admission.id %>, 'approved')" class="block w-full text-left px-3 py-2 text-xs hover:bg-green-50 text-green-700">Approve</button>
                    <button onclick="changeStatus(<%= admission.id %>, 'rejected')" class="block w-full text-left px-3 py-2 text-xs hover:bg-red-50 text-red-700">Reject</button>
@@ -149,9 +149,15 @@
     }
   }
 
-  function confirmDelete(id, type) {
-    if(confirm('Permanently delete this application? This cannot be undone.')) {
-        // Your delete logic here
-    }
+ function confirmDelete(id, type) {
+  const courseType = type.toLowerCase();
+
+  if (confirm(`Permanently delete this ${type} application? This cannot be undone.`)) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+        form.action = `/admin/admissions/${courseType}/${id}/delete`;
+    document.body.appendChild(form);
+    form.submit();
   }
+}
 </script>

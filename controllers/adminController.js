@@ -3,6 +3,7 @@ const { prisma } = require("../config/db");
 const { asyncHandler } = require("../middleware/errorHandler");
 const { deleteFile } = require("../middleware/upload");
 const path = require("path");
+const fs = require('fs');
 
 
 
@@ -202,9 +203,7 @@ const listAdmissions = asyncHandler(async (req, res) => {
   const skip = (page - 1) * limit;
   const status = req.query.status;
   const search = req.query.search;
-  
-  // New: Identify which table to list (default to BBA if not specified)
-  const courseType = (req.query.courseType || 'BBA').toUpperCase();
+    const courseType = (req.query.courseType || 'BBA').toUpperCase();
   const model = courseType === 'MBA' ? prisma.mbaApplication : prisma.bbaApplication;
 
   const where = {};
@@ -226,8 +225,6 @@ const listAdmissions = asyncHandler(async (req, res) => {
       ];
     }
   }
-
-  // Fetching data and including the core Student record for the Application Number
   const [admissions, total] = await Promise.all([
     model.findMany({
       where,
@@ -245,9 +242,7 @@ const listAdmissions = asyncHandler(async (req, res) => {
     }),
     model.count({ where }),
   ]);
-
   const totalPages = Math.ceil(total / limit);
-
   res.render("admin/admissions/list", {
     layout: "layouts/main",
     isAuthenticated: true,
@@ -260,29 +255,112 @@ const listAdmissions = asyncHandler(async (req, res) => {
   });
 });
 const viewAdmission = asyncHandler(async (req, res) => {
-  const admission = await prisma.admission.findUnique({
-    where: { id: parseInt(req.params.id) },
+  const { courseType, id } = req.params;
+
+  // 1. Determine which table to query
+  const model = courseType.toLowerCase() === 'mba' 
+    ? prisma.mbaApplication 
+    : prisma.bbaApplication;
+
+  // 2. Fetch the record and include the core Student data
+  const admission = await model.findUnique({
+    where: { id: parseInt(id) },
+    include: {
+      student: {
+        select: {
+          applicationNo: true,
+          email: true,
+          fullName: true
+        }
+      }
+    }
   });
 
+  // 3. Handle 404
   if (!admission) {
-    req.flash("error", "Admission not found");
-    return res.redirect("/admin/admissions");
+    req.flash("error", "Admission record not found.");
+    return res.redirect(`/admin/admissions?courseType=${courseType.toUpperCase()}`);
   }
 
-  res.render("admin/admissions/view", { admission });
+  // 4. Handle JSON Parsing for MBA
+  // Because MBA stores academic and work rows as strings in MySQL
+  if (courseType.toLowerCase() === 'mba') {
+    if (admission.academicRows) {
+      try {
+        admission.academicRows = JSON.parse(admission.academicRows);
+      } catch (e) {
+        admission.academicRows = []; 
+      }
+    }
+    if (admission.workExperienceRows) {
+      try {
+        admission.workExperienceRows = JSON.parse(admission.workExperienceRows);
+      } catch (e) {
+        admission.workExperienceRows = [];
+      }
+    }
+  }
+
+  // 5. Render the view
+  res.render("admin/admissions/view", {
+    layout: "layouts/main",
+    isAuthenticated: true,
+    admission,
+    courseType: courseType.toUpperCase(),
+  });
 });
+
+
 const editAdmissionForm = asyncHandler(async (req, res) => {
-  const admission = await prisma.admission.findUnique({
-    where: { id: parseInt(req.params.id) },
+  const { courseType, id } = req.params;
+  const appId = parseInt(id);
+
+  // 1. Identify the correct model
+  const model = courseType.toLowerCase() === 'mba' 
+    ? prisma.mbaApplication 
+    : prisma.bbaApplication;
+
+  // 2. Fetch the admission record
+  const admission = await model.findUnique({
+    where: { id: appId },
+    include: {
+      student: {
+        select: {
+          applicationNo: true,
+          email: true
+        }
+      }
+    }
   });
 
+  // 3. Handle 404
   if (!admission) {
-    req.flash("error", "Admission not found");
-    return res.redirect("/admin/admissions");
+    req.flash("error", "Admission record not found");
+    return res.redirect(`/admin/admissions?courseType=${courseType.toUpperCase()}`);
   }
 
-  res.render("admin/admissions/edit", { admission });
+  // 4. Data Preparation for the Edit Form
+  // MBA uses JSON strings for arrays; BBA uses flat fields
+  if (courseType.toLowerCase() === 'mba') {
+    try {
+      admission.academicRows = admission.academicRows ? JSON.parse(admission.academicRows) : [];
+      admission.workExperienceRows = admission.workExperienceRows ? JSON.parse(admission.workExperienceRows) : [];
+      admission.qualifyingExams = admission.qualifyingExams ? JSON.parse(admission.qualifyingExams) : [];
+    } catch (e) {
+      console.error("JSON Parsing Error for Edit Form:", e);
+    }
+  }
+
+  // 5. Render the edit view
+  // You can use a single edit file or separate ones (admin/admissions/edit-mba.ejs)
+  res.render("admin/admissions/edit", {
+    layout: "layouts/main",
+    isAuthenticated: true,
+    admission,
+    courseType: courseType.toUpperCase()
+  });
 });
+
 const updateAdmission = asyncHandler(async (req, res) => {
   const id = parseInt(req.params.id);
   const {
@@ -337,43 +415,68 @@ const updateAdmission = asyncHandler(async (req, res) => {
   req.flash("success", "Admission updated successfully");
   res.redirect(`/admin/admissions/${id}`);
 });
-const deleteAdmission = asyncHandler(async (req, res) => {
-  const id = parseInt(req.params.id);
 
-  const admission = await prisma.admission.findUnique({
-    where: { id },
+const deleteAdmission = asyncHandler(async (req, res) => {
+  const { courseType, id } = req.params;
+  const appId = parseInt(id);
+  const model = courseType.toLowerCase() === 'mba' 
+    ? prisma.mbaApplication 
+    : prisma.bbaApplication;
+
+  const admission = await model.findUnique({
+    where: { id: appId },
   });
 
   if (!admission) {
-    req.flash("error", "Admission not found");
-    return res.redirect("/admin/admissions");
+    req.flash("error", "Admission record not found");
+    return res.redirect(`/admin/admissions?courseType=${courseType.toUpperCase()}`);
   }
+  const fileFields = [
+    'photoUrl', 
+    'signatureUrl', 
+    'marksheet10Url', 
+    'marksheet12Url', 
+    'marksheetGradUrl', 
+    'casteCertificateUrl'
+  ];
 
-  if (admission.passportPhoto) {
-    deleteFile(path.join(__dirname, "..", admission.passportPhoto));
-  }
-
-  await prisma.admission.delete({ where: { id } });
-
-  req.flash("success", "Admission deleted successfully");
-  res.redirect("/admin/admissions");
+  fileFields.forEach(field => {
+    const filePath = admission[field];
+    if (filePath) {
+      const fullPath = path.join(process.cwd(), filePath);
+      if (fs.existsSync(fullPath)) {
+        try {
+          fs.unlinkSync(fullPath);
+        } catch (err) {
+          console.error(`Failed to delete file: ${fullPath}`, err);
+        }
+      }
+    }
+  });
+  await model.delete({ where: { id: appId } });
+  req.flash("success", "Admission and associated files deleted successfully");
+  res.redirect(`/admin/admissions?courseType=${courseType.toUpperCase()}`);
 });
+
 const updateStatus = asyncHandler(async (req, res) => {
-  const id = parseInt(req.params.id);
+  const { courseType, id } = req.params; 
   const { status, admin_notes } = req.body;
 
-  await prisma.admission.update({
-    where: { id },
+  const model = courseType.toLowerCase() === 'mba' 
+    ? prisma.mbaApplication 
+    : prisma.bbaApplication;
+
+  await model.update({
+    where: { id: parseInt(id) },
     data: {
-      status: status.toUpperCase(),
-      adminNotes: admin_notes || null,
+      status: status.toLowerCase(), 
+      // adminNotes: admin_notes || null, // Uncomment if added to Prisma
     },
   });
 
-  req.flash("success", "Status updated successfully");
-  res.redirect(`/admin/admissions/${id}`);
+  req.flash("success", `Application marked as ${status} successfully`);
+  res.redirect(`/admin/admissions/${courseType.toLowerCase()}/${id}`);
 });
-
 
 
 
