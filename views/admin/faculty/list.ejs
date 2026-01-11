@@ -1,0 +1,58 @@
+<div class="max-w-7xl mx-auto py-8 px-4">
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-extrabold text-gray-900">Faculty Management</h1>
+            <p class="text-gray-500">Manage directors, professors, and staff members</p>
+        </div>
+        <a href="/admin/faculty/create" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-blue-700 transition">
+            <i class="fas fa-plus mr-2"></i> Add Faculty
+        </a>
+    </div>
+
+    <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-gray-50 border-b">
+                <tr>
+                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Member</th>
+                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Designation</th>
+                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Expertise</th>
+                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                <% faculty.forEach(member => { %>
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center space-x-4">
+                            <img src="<%= member.image %>" class="w-12 h-12 rounded-full object-cover border shadow-sm" onerror="this.src='https://ui-avatars.com/api/?name=<%= member.name %>'">
+                            <div>
+                                <div class="font-bold text-gray-900"><%= member.name %></div>
+                                <div class="text-xs text-gray-500"><%= member.qualification || 'N/A' %></div>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full text-xs font-bold">
+                            <%= member.designation %>
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-sm text-gray-600"><%= member.expertise %></td>
+                    <td class="px-6 py-4 text-right space-x-2">
+                        <a href="/admin/faculty/edit/<%= member.id %>" class="text-blue-600 hover:text-blue-800 p-2">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form action="/admin/faculty/delete/<%= member.id %>?_method=DELETE" method="POST" class="inline" onsubmit="return confirm('Delete this member?')">
+                            <button type="submit" class="text-red-500 hover:text-red-700 p-2">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <% }) %>
+                <% if (faculty.length === 0) { %>
+                    <tr><td colspan="4" class="text-center py-10 text-gray-400">No faculty members found.</td></tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>

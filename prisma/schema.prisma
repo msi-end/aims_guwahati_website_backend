@@ -120,7 +120,7 @@ model MbaApplication {
   permPinCode       String? @db.VarChar(10)
 
   // Correspondence Address
-  correspondenceSameAsPermanent String @default("false")
+  correspondenceSameAsPermanent String  @default("false")
   corrAddressLine1              String? @db.VarChar(255)
   corrCity                      String? @db.VarChar(100)
   corrPostOffice                String? @db.VarChar(100)
@@ -174,7 +174,7 @@ model MbaApplication {
 
   // --- 5. Status & Declaration ---
   declaration String?  @default("false")
-  status      String?   @default("pending")
+  status      String?  @default("pending")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -206,4 +206,15 @@ model AdminUser {
   updatedAt DateTime  @updatedAt
 
   @@map("admin_users")
+}
+
+model Faculty {
+  id            Int      @id @default(autoincrement())
+  name          String
+  designation   String
+  qualification String
+  expertise     String
+  image         String // Stores the URL/path to the image
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }

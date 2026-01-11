@@ -31,7 +31,7 @@ app.set("layout extractStyles", true);
 // ===================
 // MIDDLEWARE
 // ===================
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+// app.use(cors({ origin: "http://localhost:3000", credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -85,6 +85,7 @@ app.use("/admin", require("./routes/admin"));
 app.use("/api/student", require("./routes/api/student"));
 app.use("/api/admission", require("./routes/api/applications"));
 app.use("/api/gallery", require("./routes/api/gallery"));
+app.use("/api/faculty", require("./routes/api/faculty"));
 
 app.get("/", (req, res) => res.redirect("/admin/login"));
 

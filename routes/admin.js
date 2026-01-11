@@ -1,8 +1,3 @@
-/**
- * Admin Panel Routes
- * Handles all admin panel routes
- */
-
 const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
@@ -36,5 +31,16 @@ router.post('/gallery/:id/update', isAuthenticated, uploadGalleryMiddleware, adm
 router.post('/gallery/:id/delete', isAuthenticated, adminController.deleteGallery);
 router.post('/gallery/reorder', isAuthenticated, adminController.updateGalleryOrder);
 
+
+// Faculty Management
+router.get('/faculty', adminController.listFaculty);
+router.get('/faculty/create', adminController.createFacultyForm);
+router.post('/faculty/store', uploadPassportMiddleware, adminController.createFaculty);
+
+// --- Edit & Update ---
+router.get('/faculty/edit/:id', adminController.editFacultyForm);
+router.put('/faculty/update/:id', uploadPassportMiddleware, adminController.updateFaculty);
+router.post('/faculty/update/:id', uploadPassportMiddleware, adminController.updateFaculty); 
+router.delete('/faculty/delete/:id', adminController.deleteFaculty);
 
 module.exports = router;

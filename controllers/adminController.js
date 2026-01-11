@@ -310,7 +310,6 @@ const viewAdmission = asyncHandler(async (req, res) => {
   });
 });
 
-
 const editAdmissionForm = asyncHandler(async (req, res) => {
   const { courseType, id } = req.params;
   const appId = parseInt(id);
@@ -628,11 +627,151 @@ const updateGalleryOrder = asyncHandler(async (req, res) => {
 
 
 
+
+const listFaculty = asyncHandler(async (req, res) => {
+  const faculty = await prisma.faculty.findMany({
+    orderBy: { id: "asc" },
+  });
+
+  res.render("admin/faculty/list", {
+    layout: "layouts/main",
+    isAuthenticated: true,
+    faculty,
+    currentPath: req.path,
+  });
+});
+
+// @desc    Show create form
+// @route   GET /admin/faculty/create
+const createFacultyForm = asyncHandler(async (req, res) => {
+  res.render("admin/faculty/edit", {
+    layout: "layouts/main",
+    isAuthenticated: true,
+    currentPath: req.path,
+  });
+});
+
+// @desc    Store new faculty member
+// @route   POST /admin/faculty/store
+const createFaculty = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    req.flash("error", "Profile image is required");
+    return res.redirect("/admin/faculty/create");
+  }
+
+  const { name, designation, qualification, expertise } = req.body;
+
+  await prisma.faculty.create({
+    data: {
+      name,
+      designation,
+      qualification,
+      expertise,
+      image: `/uploads/faculty/${req.file.filename}`,
+    },
+  });
+
+  req.flash("success", "Faculty member added successfully");
+  res.redirect("/admin/faculty");
+});
+
+// @desc    Show edit form
+// @route   GET /admin/faculty/edit/:id
+const editFacultyForm = asyncHandler(async (req, res) => {
+  const member = await prisma.faculty.findUnique({
+    where: { id: parseInt(req.params.id) },
+  });
+
+  if (!member) {
+    req.flash("error", "Faculty member not found");
+    return res.redirect("/admin/faculty");
+  }
+
+  res.render("admin/faculty/edit", {
+    layout: "layouts/main",
+    isAuthenticated: true,
+    member,
+    currentPath: req.path,
+  });
+});
+
+// @desc    Update faculty member
+// @route   POST /admin/faculty/update/:id
+const updateFaculty = asyncHandler(async (req, res) => {
+  const id = parseInt(req.params.id);
+  const existing = await prisma.faculty.findUnique({
+    where: { id },
+  });
+
+  if (!existing) {
+    req.flash("error", "Faculty member not found");
+    return res.redirect("/admin/faculty");
+  }
+
+  const { name, designation, qualification, expertise } = req.body;
+  const updateData = {
+    name,
+    designation,
+    qualification,
+    expertise,
+  };
+
+  if (req.file) {
+    // Delete old image if it exists and a new one is uploaded
+    if (existing.image) {
+      deleteFile(path.join(__dirname, "../../public", existing.image));
+    }
+    updateData.image = `/uploads/faculty/${req.file.filename}`;
+  }
+
+  await prisma.faculty.update({
+    where: { id },
+    data: updateData,
+  });
+
+  req.flash("success", "Faculty details updated successfully");
+  res.redirect("/admin/faculty");
+});
+
+// @desc    Delete faculty member
+// @route   DELETE /admin/faculty/delete/:id
+const deleteFaculty = asyncHandler(async (req, res) => {
+  const id = parseInt(req.params.id);
+  const member = await prisma.faculty.findUnique({
+    where: { id },
+  });
+
+  if (!member) {
+    req.flash("error", "Faculty member not found");
+    return res.redirect("/admin/faculty");
+  }
+
+  // Remove image from storage
+  if (member.image) {
+    deleteFile(path.join(__dirname, "../../public", member.image));
+  }
+
+  await prisma.faculty.delete({ where: { id } });
+
+  req.flash("success", "Faculty member removed successfully");
+  res.redirect("/admin/faculty");
+});
+
+
+
+
+
+
+
+
+
+
 module.exports = {
   showLogin,
   createAdminUser,
   login,
   logout,
+
   showDashboard,
   listAdmissions,
   viewAdmission,
@@ -640,6 +779,7 @@ module.exports = {
   updateAdmission,
   deleteAdmission,
   updateStatus,
+
   listGallery,
   createGalleryForm,
   createGallery,
@@ -647,4 +787,11 @@ module.exports = {
   updateGallery,
   deleteGallery,
   updateGalleryOrder,
+
+  listFaculty,
+  createFacultyForm,
+  createFaculty,
+  editFacultyForm,
+  updateFaculty,
+  deleteFaculty,
 };

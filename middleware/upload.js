@@ -1,8 +1,3 @@
-/**
- * File Upload Middleware using Multer
- * Handles image uploads with validation
- */
-
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
@@ -18,9 +13,9 @@ uploadDirs.forEach((dir) => {
 /**
  * Configure storage for passport photos
  */
-const passportStorage = multer.diskStorage({
+const faculty = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, "./uploads/passports");
+    cb(null, "./uploads/faculty");
   },
   filename: (req, file, cb) => {
     // Generate unique filename: timestamp-randomstring-originalname
@@ -75,12 +70,12 @@ const imageFileFilter = (req, file, cb) => {
  * Multer configuration for passport photos
  */
 const uploadPassport = multer({
-  storage: passportStorage,
+  storage: faculty,
   fileFilter: imageFileFilter,
   limits: {
     fileSize: parseInt(process.env.MAX_FILE_SIZE) || 5 * 1024 * 1024, // 5MB default
   },
-}).single("passport_photo"); // Field name in form
+}).single("image");
 
 /**
  * Multer configuration for gallery images
