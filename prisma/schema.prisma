@@ -191,7 +191,6 @@ model Gallery {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  @@map("gallery")
 }
 
 model AdminUser {
@@ -205,7 +204,6 @@ model AdminUser {
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
 
-  @@map("admin_users")
 }
 
 model Faculty {
