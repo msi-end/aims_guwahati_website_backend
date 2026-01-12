@@ -16,6 +16,7 @@
                     <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Member</th>
                     <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Designation</th>
                     <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Expertise</th>
+                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Type</th>
                     <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase text-right">Actions</th>
                 </tr>
             </thead>
@@ -37,6 +38,7 @@
                         </span>
                     </td>
                     <td class="px-6 py-4 text-sm text-gray-600"><%= member.expertise %></td>
+                    <td class="px-6 py-4 text-sm text-gray-600"><%= member.type %></td>
                     <td class="px-6 py-4 text-right space-x-2">
                         <a href="/admin/faculty/edit/<%= member.id %>" class="text-blue-600 hover:text-blue-800 p-2">
                             <i class="fas fa-edit"></i>

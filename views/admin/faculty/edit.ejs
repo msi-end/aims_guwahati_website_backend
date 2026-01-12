@@ -1,14 +1,16 @@
 <div class="max-w-3xl mx-auto py-10 px-4">
     <div class="mb-8">
-        <a href="/admin/faculty" class="text-blue-600 text-sm hover:underline"><i class="fas fa-arrow-left mr-1"></i> Back to List</a>
+        <a href="/admin/faculty" class="text-blue-600 text-sm hover:underline"><i class="fas fa-arrow-left mr-1"></i>
+            Back to List</a>
         <h1 class="text-3xl font-bold text-gray-900 mt-2">
-            <%= typeof member !== 'undefined' ? 'Edit Faculty' : 'Add New Faculty' %>
+            <%= typeof member !=='undefined' ? 'Edit Faculty' : 'Add New Faculty' %>
         </h1>
     </div>
 
-    <form action="<%= typeof member !== 'undefined' ? '/admin/faculty/update/'+member.id+'?_method=PUT' : '/admin/faculty/store' %>" 
-          method="POST" enctype="multipart/form-data" class="space-y-6 bg-white p-8 rounded-2xl border shadow-sm">
-        
+    <form
+        action="<%= typeof member !== 'undefined' ? '/admin/faculty/update/'+member.id+'?_method=PUT' : '/admin/faculty/store' %>"
+        method="POST" enctype="multipart/form-data" class="space-y-6 bg-white p-8 rounded-2xl border shadow-sm">
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-1">
                 <label class="text-xs font-bold text-gray-400 uppercase">Full Name</label>
@@ -18,38 +20,61 @@
 
             <div class="space-y-1">
                 <label class="text-xs font-bold text-gray-400 uppercase">Designation</label>
-                <input type="text" name="designation" value="<%= typeof member !== 'undefined' ? member.designation : '' %>" required
-                    placeholder="e.g. Director" class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                <input type="text" name="designation"
+                    value="<%= typeof member !== 'undefined' ? member.designation : '' %>" required
+                    placeholder="e.g. Director"
+                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
 
             <div class="space-y-1">
                 <label class="text-xs font-bold text-gray-400 uppercase">Qualification</label>
-                <input type="text" name="qualification" value="<%= typeof member !== 'undefined' ? member.qualification : '' %>" required
-                    placeholder="Ph.D, MBA..." class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                <input type="text" name="qualification"
+                    value="<%= typeof member !== 'undefined' ? member.qualification : '' %>" required
+                    placeholder="Ph.D, MBA..."
+                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
+            <div class="space-y-1">
+                <label class="text-xs font-bold text-gray-400 uppercase">Faculty Category</label>
+                <select name="type" required
+                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                    <option value="" disabled <%=typeof member==='undefined' ? 'selected' : '' %>>Select Category
+                    </option>
 
+                    <% const categories=[ "CORE FACULTY" , "RESEARCH ASSOCIATE" , "VISITING PROFESSORS"
+                        , "ADJUNCT FACULTY" , "CORE ADMINISTRATION TEAM" , "STAFF" ]; %>
+
+                        <% categories.forEach(cat=> { %>
+                            <option value="<%= cat %>" <%=(typeof member !=='undefined' && member.type===cat)
+                                ? 'selected' : '' %>>
+                                <%= cat %>
+                            </option>
+                            <% }) %>
+                </select>
+            </div>
             <div class="space-y-1">
                 <label class="text-xs font-bold text-gray-400 uppercase">Area of Expertise</label>
-                <input type="text" name="expertise" value="<%= typeof member !== 'undefined' ? member.expertise : '' %>" required
-                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                <input type="text" name="expertise" value="<%= typeof member !== 'undefined' ? member.expertise : '' %>"
+                    required class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
         </div>
 
         <div class="space-y-1">
             <label class="text-xs font-bold text-gray-400 uppercase">Profile Image</label>
-            <% if (typeof member !== 'undefined' && member.image) { %>
+            <% if (typeof member !=='undefined' && member.image) { %>
                 <div class="mb-2">
                     <img src="<%= member.image %>" class="w-20 h-20 rounded-lg object-cover border">
                     <p class="text-[10px] text-gray-400 italic">Leave empty to keep current image</p>
                 </div>
-            <% } %>
-            <input type="file" name="image" <%= typeof member !== 'undefined' ? '' : 'required' %>
-                class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
+                <% } %>
+                    <input type="file" name="image" <%=typeof member !=='undefined' ? '' : 'required' %>
+                    class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0
+                    file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100">
         </div>
 
         <div class="pt-4">
-            <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition">
-                <%= typeof member !== 'undefined' ? 'Update Faculty Member' : 'Save Faculty Member' %>
+            <button type="submit"
+                class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-lg shadow-blue-200 transition">
+                <%= typeof member !=='undefined' ? 'Update Faculty Member' : 'Save Faculty Member' %>
             </button>
         </div>
     </form>

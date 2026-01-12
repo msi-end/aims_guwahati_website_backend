@@ -213,6 +213,7 @@ model Faculty {
   qualification String
   expertise     String
   image         String // Stores the URL/path to the image
+  type          String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 }

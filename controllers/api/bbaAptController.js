@@ -56,8 +56,8 @@ exports.createBbaApplication = async (req, res) => {
 // GET /api/bba/:id
 exports.getBbaById = async (req, res) => {
   try {
-    const application = await prisma.bbaApplication.findUnique({
-      where: { id: parseInt(req.params.id) },
+    const application = await prisma.bbaApplication.findFirst({
+      where: { studentId: parseInt(req.params.id) },
       include: { student: true },
     });
 

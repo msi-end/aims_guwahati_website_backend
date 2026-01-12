@@ -667,6 +667,7 @@ const createFaculty = asyncHandler(async (req, res) => {
       designation,
       qualification,
       expertise,
+      type: type || null,
       image: `/uploads/faculty/${req.file.filename}`,
     },
   });
@@ -708,12 +709,13 @@ const updateFaculty = asyncHandler(async (req, res) => {
     return res.redirect("/admin/faculty");
   }
 
-  const { name, designation, qualification, expertise } = req.body;
+  const { name, designation, qualification, expertise, type } = req.body;
   const updateData = {
     name,
     designation,
     qualification,
     expertise,
+    type: type || null,
   };
 
   if (req.file) {
