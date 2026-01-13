@@ -641,8 +641,6 @@ const listFaculty = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Show create form
-// @route   GET /admin/faculty/create
 const createFacultyForm = asyncHandler(async (req, res) => {
   res.render("admin/faculty/edit", {
     layout: "layouts/main",
@@ -651,15 +649,13 @@ const createFacultyForm = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Store new faculty member
-// @route   POST /admin/faculty/store
 const createFaculty = asyncHandler(async (req, res) => {
   if (!req.file) {
     req.flash("error", "Profile image is required");
     return res.redirect("/admin/faculty/create");
   }
 
-  const { name, designation, qualification, expertise } = req.body;
+  const { name, designation, qualification, expertise, type } = req.body;
 
   await prisma.faculty.create({
     data: {
@@ -676,8 +672,7 @@ const createFaculty = asyncHandler(async (req, res) => {
   res.redirect("/admin/faculty");
 });
 
-// @desc    Show edit form
-// @route   GET /admin/faculty/edit/:id
+
 const editFacultyForm = asyncHandler(async (req, res) => {
   const member = await prisma.faculty.findUnique({
     where: { id: parseInt(req.params.id) },
@@ -696,8 +691,6 @@ const editFacultyForm = asyncHandler(async (req, res) => {
   });
 });
 
-// @desc    Update faculty member
-// @route   POST /admin/faculty/update/:id
 const updateFaculty = asyncHandler(async (req, res) => {
   const id = parseInt(req.params.id);
   const existing = await prisma.faculty.findUnique({
@@ -719,7 +712,6 @@ const updateFaculty = asyncHandler(async (req, res) => {
   };
 
   if (req.file) {
-    // Delete old image if it exists and a new one is uploaded
     if (existing.image) {
       deleteFile(path.join(__dirname, "../../public", existing.image));
     }
@@ -735,20 +727,16 @@ const updateFaculty = asyncHandler(async (req, res) => {
   res.redirect("/admin/faculty");
 });
 
-// @desc    Delete faculty member
-// @route   DELETE /admin/faculty/delete/:id
+
 const deleteFaculty = asyncHandler(async (req, res) => {
   const id = parseInt(req.params.id);
   const member = await prisma.faculty.findUnique({
     where: { id },
   });
-
   if (!member) {
     req.flash("error", "Faculty member not found");
     return res.redirect("/admin/faculty");
   }
-
-  // Remove image from storage
   if (member.image) {
     deleteFile(path.join(__dirname, "../../public", member.image));
   }
