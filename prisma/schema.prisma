@@ -85,6 +85,15 @@ model BbaApplication {
   hostelType      String?
   guardianConsent String? @default("No")
 
+
+  photoUrl            String? @db.VarChar(500)
+  signatureUrl        String? @db.VarChar(500)
+  marksheet10Url      String? @db.VarChar(500)
+  marksheet12Url      String? @db.VarChar(500)
+  marksheetGradUrl    String? @db.VarChar(500)
+  casteCertificateUrl String? @db.VarChar(500)
+
+  // --- 5. Status & Declaration ---
   declaration String?  @default("false")
   status      String   @default("pending")
   createdAt   DateTime @default(now())

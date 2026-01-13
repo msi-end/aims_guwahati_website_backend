@@ -1,22 +1,25 @@
 meta {
   name: upload_files
   type: http
-  seq: 4
+  seq: 5
 }
 
 put {
-  url: http://localhost:5000/api/admission/bba/:id
+  url: http://localhost:5000/api/admission/upload/:type/:id
   body: multipartForm
-  auth: inherit
+  auth: bearer
 }
 
 params:path {
-  id: 
+  type: bba
+  id: 3
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InN0dWRlbnQiLCJhcHBsaWNhdGlvbk5vIjoiOTg3MjcxNzM0OSIsImlhdCI6MTc2ODI4MzIzNCwiZXhwIjoxNzY4Mjg2ODM0fQ.R7oS-Sl9WC-KZjYXk9Ff51qUKJU_xOaClj_g5Q7Tqpw
 }
 
 body:multipart-form {
-  : @file()
-  : @file()
-  : @file()
-  : @file()
+  photoUrl: @file(C:\Users\BS\Pictures\2nd.png) @contentType(jpg/png)
+  signatureUrl: @file(C:\Users\BS\Pictures\aso.png)
 }

@@ -38,7 +38,9 @@
         <div class="space-y-6">
             <div class="bg-white rounded-2xl shadow-sm border p-6 text-center">
                 <% if (admission.photoUrl) { %>
-                    <img src="/<%= admission.photoUrl %>" class="w-40 h-48 mx-auto object-cover rounded-xl shadow-lg border-4 border-white ring-1 ring-gray-100">
+                    <img src="<%= admission.photoUrl.startsWith('/') ? admission.photoUrl : '/' + admission.photoUrl %>" 
+                         class="w-40 h-48 mx-auto object-cover rounded-xl shadow-lg border-4 border-white ring-1 ring-gray-100"
+                         onerror="this.src='/images/placeholder-user.png'">
                 <% } else { %>
                     <div class="w-40 h-48 mx-auto bg-gray-100 rounded-xl flex items-center justify-center border-2 border-dashed border-gray-300">
                         <i class="fas fa-user text-5xl text-gray-300"></i>
@@ -67,6 +69,14 @@
                         <span class="text-sm font-medium"><%= admission.aadhaarNumber || 'N/A' %></span>
                     </div>
                 </div>
+                
+                <% if (admission.signatureUrl) { %>
+                    <div class="mt-6 border-t pt-4">
+                        <span class="block text-xs font-bold text-gray-400 uppercase mb-2 text-left">Digital Signature</span>
+                        <img src="<%= admission.signatureUrl.startsWith('/') ? admission.signatureUrl : '/' + admission.signatureUrl %>" 
+                             class="h-16 w-full object-contain bg-gray-50 rounded border p-1">
+                    </div>
+                <% } %>
             </div>
 
             <div class="bg-white rounded-2xl shadow-sm border p-6">
@@ -134,100 +144,42 @@
             </section>
 
             <section class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                <div class="px-6 py-4 bg-gray-50 border-b flex justify-between">
-                    <h3 class="font-bold text-gray-800"><i class="fas fa-graduation-cap mr-2"></i>Academic History</h3>
-                    <% if(isMba) { %><span class="text-xs font-bold text-indigo-600">Degree: <%= admission.degree || 'N/A' %></span><% } %>
-                </div>
-                <div class="p-0">
-                    <table class="w-full text-left text-sm">
-                        <thead class="bg-gray-50 text-gray-500 text-xs uppercase font-black">
-                            <tr>
-                                <th class="px-6 py-3">Examination</th>
-                                <th class="px-6 py-3">Board/Institution</th>
-                                <th class="px-6 py-3">Year</th>
-                                <th class="px-6 py-3">Result</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-100">
-                            <% if (isMba && admission.academicRows) { 
-                                const rows = typeof admission.academicRows === 'string' ? JSON.parse(admission.academicRows) : admission.academicRows;
-                                rows.forEach(row => { %>
-                                    <tr>
-                                        <td class="px-6 py-4 font-bold text-gray-700"><%= row.exam || 'N/A' %></td>
-                                        <td class="px-6 py-4"><%= row.board || row.institution || 'N/A' %></td>
-                                        <td class="px-6 py-4"><%= row.year || 'N/A' %></td>
-                                        <td class="px-6 py-4 text-blue-600 font-bold"><%= row.percentage || '0' %>%</td>
-                                    </tr>
-                            <%  });
-                               } else { %>
-                                <tr>
-                                    <td class="px-6 py-4 font-bold text-gray-700">Class 10</td>
-                                    <td class="px-6 py-4"><%= admission.c10Board || 'N/A' %><br><span class="text-xs text-gray-400"><%= admission.c10School || 'N/A' %></span></td>
-                                    <td class="px-6 py-4"><%= admission.c10Year || 'N/A' %></td>
-                                    <td class="px-6 py-4 text-blue-600 font-bold"><%= admission.c10Percentage || '0' %>%</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-6 py-4 font-bold text-gray-700">Class 12</td>
-                                    <td class="px-6 py-4"><%= admission.c12Board || 'N/A' %><br><span class="text-xs text-gray-400"><%= admission.c12School || 'N/A' %></span></td>
-                                    <td class="px-6 py-4"><%= admission.c12Year || 'N/A' %></td>
-                                    <td class="px-6 py-4 text-blue-600 font-bold"><%= admission.c12Percentage || '0' %>%</td>
-                                </tr>
-                            <% } %>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
-            <% if (isMba) { %>
-                <section class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                    <div class="px-6 py-4 bg-gray-50 border-b"><h3 class="font-bold text-gray-800">Entrance & Work Experience</h3></div>
-                    <div class="p-6 space-y-6">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-xs font-bold text-gray-400 uppercase">Qualifying Exam</label>
-                                <p class="text-sm font-semibold"><%= admission.qualifyingExams || 'N/A' %> (Score: <%= admission.qualifyingExamScore || 'N/A' %>)</p>
-                            </div>
-                            <div>
-                                <label class="text-xs font-bold text-gray-400 uppercase">Specialisation</label>
-                                <p class="text-sm font-semibold text-indigo-600"><%= admission.specialisation || 'N/A' %></p>
-                            </div>
-                        </div>
-                        <div class="border-t pt-4">
-                            <label class="text-xs font-bold text-gray-400 uppercase">Work Experience</label>
-                            <p class="text-sm italic text-gray-600"><%= admission.workExperienceRows || 'No work experience details provided.' %></p>
-                        </div>
-                    </div>
-                </section>
-            <% } %>
-
-            <section class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-                <div class="px-6 py-4 bg-gray-800 text-white flex justify-between">
+                <div class="px-6 py-4 bg-gray-800 text-white flex justify-between items-center">
                     <h3 class="font-bold">Uploaded Documents</h3>
-                    <i class="fas fa-file-pdf"></i>
+                    <span class="text-xs text-gray-300">Click to preview</span>
                 </div>
-                <div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <% const docs = isMba ? [
+                <div class="p-6 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                    <% 
+                    // Using the new Prisma fields explicitly
+                    const docs = [
                         { label: '10th Marksheet', url: admission.marksheet10Url },
                         { label: '12th Marksheet', url: admission.marksheet12Url },
                         { label: 'Graduation', url: admission.marksheetGradUrl },
-                        { label: 'Caste Certificate', url: admission.casteCertificateUrl },
+                        { label: 'Caste Cert.', url: admission.casteCertificateUrl },
                         { label: 'Signature', url: admission.signatureUrl }
-                    ] : [
-                        { label: '10th Result', url: admission.c10MarksObt },
-                        { label: '12th Result', url: admission.c12MarksObt }
-                    ]; %>
+                    ]; 
+                    %>
 
                     <% docs.forEach(doc => { %>
-                        <div class="flex flex-col items-center p-4 border rounded-xl hover:bg-gray-50 transition">
-                            <span class="text-[10px] font-black text-gray-400 uppercase mb-2"><%= doc.label %></span>
+                        <div class="flex flex-col items-center p-4 border rounded-xl hover:bg-gray-50 transition-all group">
+                            <span class="text-[10px] font-black text-gray-400 uppercase mb-3 text-center h-8 flex items-center">
+                                <%= doc.label %>
+                            </span>
+                            
                             <% if (doc.url) { %>
-                                <a href="/<%= doc.url %>" target="_blank" class="text-blue-500 hover:text-blue-700">
-                                    <i class="fas fa-file-alt text-3xl"></i>
-                                    <span class="block text-xs mt-1 text-center">View File</span>
+                                <a href="<%= doc.url.startsWith('/') ? doc.url : '/' + doc.url %>" 
+                                   target="_blank" 
+                                   class="flex flex-col items-center">
+                                    <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                                        <i class="fas fa-file-pdf text-2xl"></i>
+                                    </div>
+                                    <span class="block text-[10px] mt-2 text-blue-600 font-bold">VIEW FILE</span>
                                 </a>
                             <% } else { %>
-                                <i class="fas fa-times-circle text-gray-200 text-3xl"></i>
-                                <span class="text-xs text-gray-300 mt-1 uppercase font-bold">N/A</span>
+                                <div class="w-12 h-12 bg-gray-50 text-gray-200 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-minus text-xl"></i>
+                                </div>
+                                <span class="text-[10px] text-gray-300 mt-2 uppercase font-bold">NOT UPLOADED</span>
                             <% } %>
                         </div>
                     <% }) %>
