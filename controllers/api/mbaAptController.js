@@ -56,7 +56,7 @@ exports.createMbaApplication = async (req, res) => {
 exports.getMbaById = async (req, res) => {
   try {
     const application = await prisma.mbaApplication.findUnique({
-      where: { id: parseInt(req.params.id) },
+      where: { studentId: parseInt(req.params.id) },
       include: { student: true },
     });
 
