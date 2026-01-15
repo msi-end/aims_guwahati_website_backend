@@ -1,0 +1,70 @@
+<div class="max-w-3xl mx-auto py-8 px-4">
+    <div class="mb-8">
+        <a href="/admin/notifications" class="text-sm text-blue-600 font-bold hover:underline"><i class="fas fa-arrow-left mr-1"></i> Back to List</a>
+        <h1 class="text-2xl font-bold text-gray-900 mt-2">
+            <%= typeof item !== 'undefined' ? 'Edit Notification' : 'New Notification' %>
+        </h1>
+    </div>
+
+    <form action="/admin/notifications/<%= typeof item !== 'undefined' ? 'update/' + item.id : 'create' %>" method="POST" class="bg-white rounded-2xl shadow-sm border p-8 space-y-6">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-1">
+                <label class="text-xs font-bold text-gray-400 uppercase">Category</label>
+                <select name="category"  class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    <% const cats = ["EXAM RESULT", "ADMISSION", "GENERAL NOTICE", "HOLIDAY", "EVENT","Tender"]; %>
+                    <% cats.forEach(c => { %>
+                        <option value="<%= c %>" <%= (typeof item !== 'undefined' && item.category === c) ? 'selected' : '' %>><%= c %></option>
+                    <% }) %>
+                </select>
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-xs font-bold text-gray-400 uppercase">Announcement Title</label>
+                <input type="text" name="title" value="<%= typeof item !== 'undefined' ? item.title : '' %>" 
+                    class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="e.g. End Semester Results Declared">
+            </div>
+        </div>
+
+        <div class="space-y-1">
+            <label class="text-xs font-bold text-gray-400 uppercase">Detailed Description</label>
+            <textarea name="description" rows="3" 
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"><%= typeof item !== 'undefined' ? item.description : '' %></textarea>
+        </div>
+
+        <div class="space-y-1">
+            <label class="text-xs font-bold text-gray-400 uppercase">Redirect URL (Optional)</label>
+            <input type="text" name="redirectUrl" value="<%= typeof item !== 'undefined' ? item.redirectUrl : '' %>"
+                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="https://aims.com/results/2026">
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+            <div class="space-y-1">
+                <label class="text-xs font-bold text-gray-400 uppercase">Publish Date</label>
+                <input type="date" name="publishDate" 
+                    value="<%= typeof item !== 'undefined' ? item.publishDate.toISOString().split('T')[0] : new Date().toISOString().split('T')[0] %>"
+                    class="w-full px-4 py-2 border rounded-lg">
+            </div>
+
+            <div class="space-y-1">
+                <label class="text-xs font-bold text-gray-400 uppercase">End Date (Archive Date)</label>
+                <input type="date" name="endDate" 
+                    value="<%= (typeof item !== 'undefined' && item.endDate) ? item.endDate.toISOString().split('T')[0] : '' %>"
+                    class="w-full px-4 py-2 border rounded-lg">
+            </div>
+        </div>
+
+        <% if (typeof item !== 'undefined') { %>
+            <div class="flex items-center space-x-3 pt-2">
+                <input type="checkbox" name="is_active" id="is_active" <%= item.isActive ? 'checked' : '' %> class="w-4 h-4 text-blue-600">
+                <label for="is_active" class="text-sm font-bold text-gray-700">Set as Active (Visible on site)</label>
+            </div>
+        <% } %>
+
+        <div class="pt-6">
+            <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-200">
+                <%= typeof item !== 'undefined' ? 'Update Notification' : 'Publish Announcement' %>
+            </button>
+        </div>
+    </form>
+</div>

@@ -43,4 +43,14 @@ router.put('/faculty/update/:id', uploadPassportMiddleware, adminController.upda
 router.post('/faculty/update/:id', uploadPassportMiddleware, adminController.updateFaculty); 
 router.delete('/faculty/delete/:id', adminController.deleteFaculty);
 
+
+
+router.get('/notifications', adminController.listNotifications);
+router.get('/notifications/create', adminController.createNotificationForm);
+router.post('/notifications/create', adminController.createNotification);
+router.get('/notifications/edit/:id', adminController.editNotificationForm);
+router.post('/notifications/update/:id', adminController.updateNotification);
+router.post('/notifications/delete/:id', adminController.deleteNotification);
+
+    
 module.exports = router;

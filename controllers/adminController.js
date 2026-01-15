@@ -3,9 +3,7 @@ const { prisma } = require("../config/db");
 const { asyncHandler } = require("../middleware/errorHandler");
 const { deleteFile } = require("../middleware/upload");
 const path = require("path");
-const fs = require('fs');
-
-
+const fs = require("fs");
 
 const showLogin = asyncHandler(async (req, res) => {
   await res.render("admin/login", {
@@ -94,10 +92,6 @@ const logout = asyncHandler(async (req, res) => {
     res.redirect("/admin/login");
   });
 });
-
-
-
-
 
 const showDashboard = asyncHandler(async (req, res) => {
   // =====================
@@ -203,14 +197,15 @@ const listAdmissions = asyncHandler(async (req, res) => {
   const skip = (page - 1) * limit;
   const status = req.query.status;
   const search = req.query.search;
-    const courseType = (req.query.courseType || 'BBA').toUpperCase();
-  const model = courseType === 'MBA' ? prisma.mbaApplication : prisma.bbaApplication;
+  const courseType = (req.query.courseType || "BBA").toUpperCase();
+  const model =
+    courseType === "MBA" ? prisma.mbaApplication : prisma.bbaApplication;
 
   const where = {};
   if (status) where.status = status; // No .toUpperCase() if your defaults are lowercase "pending"
-  
+
   if (search) {
-    if (courseType === 'MBA') {
+    if (courseType === "MBA") {
       where.OR = [
         { firstName: { contains: search } },
         { lastName: { contains: search } },
@@ -235,10 +230,10 @@ const listAdmissions = asyncHandler(async (req, res) => {
         student: {
           select: {
             applicationNo: true,
-            email: true
-          }
-        }
-      }
+            email: true,
+          },
+        },
+      },
     }),
     model.count({ where }),
   ]);
@@ -258,9 +253,10 @@ const viewAdmission = asyncHandler(async (req, res) => {
   const { courseType, id } = req.params;
 
   // 1. Determine which table to query
-  const model = courseType.toLowerCase() === 'mba' 
-    ? prisma.mbaApplication 
-    : prisma.bbaApplication;
+  const model =
+    courseType.toLowerCase() === "mba"
+      ? prisma.mbaApplication
+      : prisma.bbaApplication;
 
   // 2. Fetch the record and include the core Student data
   const admission = await model.findUnique({
@@ -270,26 +266,28 @@ const viewAdmission = asyncHandler(async (req, res) => {
         select: {
           applicationNo: true,
           email: true,
-          fullName: true
-        }
-      }
-    }
+          fullName: true,
+        },
+      },
+    },
   });
 
   // 3. Handle 404
   if (!admission) {
     req.flash("error", "Admission record not found.");
-    return res.redirect(`/admin/admissions?courseType=${courseType.toUpperCase()}`);
+    return res.redirect(
+      `/admin/admissions?courseType=${courseType.toUpperCase()}`
+    );
   }
 
   // 4. Handle JSON Parsing for MBA
   // Because MBA stores academic and work rows as strings in MySQL
-  if (courseType.toLowerCase() === 'mba') {
+  if (courseType.toLowerCase() === "mba") {
     if (admission.academicRows) {
       try {
         admission.academicRows = JSON.parse(admission.academicRows);
       } catch (e) {
-        admission.academicRows = []; 
+        admission.academicRows = [];
       }
     }
     if (admission.workExperienceRows) {
@@ -309,15 +307,15 @@ const viewAdmission = asyncHandler(async (req, res) => {
     courseType: courseType.toUpperCase(),
   });
 });
-
 const editAdmissionForm = asyncHandler(async (req, res) => {
   const { courseType, id } = req.params;
   const appId = parseInt(id);
 
   // 1. Identify the correct model
-  const model = courseType.toLowerCase() === 'mba' 
-    ? prisma.mbaApplication 
-    : prisma.bbaApplication;
+  const model =
+    courseType.toLowerCase() === "mba"
+      ? prisma.mbaApplication
+      : prisma.bbaApplication;
 
   // 2. Fetch the admission record
   const admission = await model.findUnique({
@@ -326,25 +324,33 @@ const editAdmissionForm = asyncHandler(async (req, res) => {
       student: {
         select: {
           applicationNo: true,
-          email: true
-        }
-      }
-    }
+          email: true,
+        },
+      },
+    },
   });
 
   // 3. Handle 404
   if (!admission) {
     req.flash("error", "Admission record not found");
-    return res.redirect(`/admin/admissions?courseType=${courseType.toUpperCase()}`);
+    return res.redirect(
+      `/admin/admissions?courseType=${courseType.toUpperCase()}`
+    );
   }
 
   // 4. Data Preparation for the Edit Form
   // MBA uses JSON strings for arrays; BBA uses flat fields
-  if (courseType.toLowerCase() === 'mba') {
+  if (courseType.toLowerCase() === "mba") {
     try {
-      admission.academicRows = admission.academicRows ? JSON.parse(admission.academicRows) : [];
-      admission.workExperienceRows = admission.workExperienceRows ? JSON.parse(admission.workExperienceRows) : [];
-      admission.qualifyingExams = admission.qualifyingExams ? JSON.parse(admission.qualifyingExams) : [];
+      admission.academicRows = admission.academicRows
+        ? JSON.parse(admission.academicRows)
+        : [];
+      admission.workExperienceRows = admission.workExperienceRows
+        ? JSON.parse(admission.workExperienceRows)
+        : [];
+      admission.qualifyingExams = admission.qualifyingExams
+        ? JSON.parse(admission.qualifyingExams)
+        : [];
     } catch (e) {
       console.error("JSON Parsing Error for Edit Form:", e);
     }
@@ -356,10 +362,9 @@ const editAdmissionForm = asyncHandler(async (req, res) => {
     layout: "layouts/main",
     isAuthenticated: true,
     admission,
-    courseType: courseType.toUpperCase()
+    courseType: courseType.toUpperCase(),
   });
 });
-
 const updateAdmission = asyncHandler(async (req, res) => {
   const id = parseInt(req.params.id);
   const {
@@ -414,13 +419,13 @@ const updateAdmission = asyncHandler(async (req, res) => {
   req.flash("success", "Admission updated successfully");
   res.redirect(`/admin/admissions/${id}`);
 });
-
 const deleteAdmission = asyncHandler(async (req, res) => {
   const { courseType, id } = req.params;
   const appId = parseInt(id);
-  const model = courseType.toLowerCase() === 'mba' 
-    ? prisma.mbaApplication 
-    : prisma.bbaApplication;
+  const model =
+    courseType.toLowerCase() === "mba"
+      ? prisma.mbaApplication
+      : prisma.bbaApplication;
 
   const admission = await model.findUnique({
     where: { id: appId },
@@ -428,18 +433,20 @@ const deleteAdmission = asyncHandler(async (req, res) => {
 
   if (!admission) {
     req.flash("error", "Admission record not found");
-    return res.redirect(`/admin/admissions?courseType=${courseType.toUpperCase()}`);
+    return res.redirect(
+      `/admin/admissions?courseType=${courseType.toUpperCase()}`
+    );
   }
   const fileFields = [
-    'photoUrl', 
-    'signatureUrl', 
-    'marksheet10Url', 
-    'marksheet12Url', 
-    'marksheetGradUrl', 
-    'casteCertificateUrl'
+    "photoUrl",
+    "signatureUrl",
+    "marksheet10Url",
+    "marksheet12Url",
+    "marksheetGradUrl",
+    "casteCertificateUrl",
   ];
 
-  fileFields.forEach(field => {
+  fileFields.forEach((field) => {
     const filePath = admission[field];
     if (filePath) {
       const fullPath = path.join(process.cwd(), filePath);
@@ -456,19 +463,19 @@ const deleteAdmission = asyncHandler(async (req, res) => {
   req.flash("success", "Admission and associated files deleted successfully");
   res.redirect(`/admin/admissions?courseType=${courseType.toUpperCase()}`);
 });
-
 const updateStatus = asyncHandler(async (req, res) => {
-  const { courseType, id } = req.params; 
+  const { courseType, id } = req.params;
   const { status, admin_notes } = req.body;
 
-  const model = courseType.toLowerCase() === 'mba' 
-    ? prisma.mbaApplication 
-    : prisma.bbaApplication;
+  const model =
+    courseType.toLowerCase() === "mba"
+      ? prisma.mbaApplication
+      : prisma.bbaApplication;
 
   await model.update({
     where: { id: parseInt(id) },
     data: {
-      status: status.toLowerCase(), 
+      status: status.toLowerCase(),
       // adminNotes: admin_notes || null, // Uncomment if added to Prisma
     },
   });
@@ -476,9 +483,6 @@ const updateStatus = asyncHandler(async (req, res) => {
   req.flash("success", `Application marked as ${status} successfully`);
   res.redirect(`/admin/admissions/${courseType.toLowerCase()}/${id}`);
 });
-
-
-
 
 const listGallery = asyncHandler(async (req, res) => {
   const category = req.query.category;
@@ -624,10 +628,6 @@ const updateGalleryOrder = asyncHandler(async (req, res) => {
   res.json({ success: true });
 });
 
-
-
-
-
 const listFaculty = asyncHandler(async (req, res) => {
   const faculty = await prisma.faculty.findMany({
     orderBy: { id: "asc" },
@@ -671,7 +671,6 @@ const createFaculty = asyncHandler(async (req, res) => {
   req.flash("success", "Faculty member added successfully");
   res.redirect("/admin/faculty");
 });
-
 
 const editFacultyForm = asyncHandler(async (req, res) => {
   const member = await prisma.faculty.findUnique({
@@ -727,7 +726,6 @@ const updateFaculty = asyncHandler(async (req, res) => {
   res.redirect("/admin/faculty");
 });
 
-
 const deleteFaculty = asyncHandler(async (req, res) => {
   const id = parseInt(req.params.id);
   const member = await prisma.faculty.findUnique({
@@ -751,10 +749,128 @@ const deleteFaculty = asyncHandler(async (req, res) => {
 
 
 
+const listNotifications = asyncHandler(async (req, res) => {
+  const category = req.query.category;
+  const where = category ? { category: category.toUpperCase() } : {};
 
+  const notifications = await prisma.notification.findMany({
+    where,
+    orderBy: { publishDate: "desc" },
+  });
 
+  const categories = await prisma.notification.groupBy({
+    by: ["category"],
+    _count: {
+      category: true,
+    },
+  });
 
+  res.render("admin/notifications/list", {
+    layout: "layouts/main",
+    isAuthenticated: true,
+    notifications,
+    categories: categories.map((c) => ({
+      name: c.category,
+      count: c._count.category,
+    })),
+    currentCategory: category || "all",
+    currentPath: req.path,
+  });
+});
 
+const createNotificationForm = asyncHandler(async (req, res) => {
+  res.render("admin/notifications/create", {
+    layout: "layouts/main",
+    isAuthenticated: true,
+  });
+});
+
+const createNotification = asyncHandler(async (req, res) => {
+  const { category, title, description, redirectUrl, publishDate, endDate } =
+    req.body;
+
+  await prisma.notification.create({
+    data: {
+      category: category.toUpperCase(),
+      title,
+      description,
+      redirectUrl: redirectUrl || null,
+      publishDate: publishDate ? new Date(publishDate) : new Date(),
+      endDate: endDate ? new Date(endDate) : null,
+      isActive: true,
+    },
+  });
+
+  req.flash("success", "Notification published successfully");
+  res.redirect("/admin/notifications");
+});
+
+const editNotificationForm = asyncHandler(async (req, res) => {
+  const item = await prisma.notification.findUnique({
+    where: { id: parseInt(req.params.id) },
+  });
+
+  if (!item) {
+    req.flash("error", "Notification not found");
+    return res.redirect("/admin/notifications");
+  }
+
+  res.render("admin/notifications/edit", {
+    layout: "layouts/main",
+    isAuthenticated: true,
+    item,
+  });
+});
+
+const updateNotification = asyncHandler(async (req, res) => {
+  const id = parseInt(req.params.id);
+  const {
+    category,
+    title,
+    description,
+    redirectUrl,
+    publishDate,
+    endDate,
+    is_active,
+  } = req.body;
+
+  const existing = await prisma.notification.findUnique({ where: { id } });
+  if (!existing) {
+    req.flash("error", "Notification not found");
+    return res.redirect("/admin/notifications");
+  }
+
+  await prisma.notification.update({
+    where: { id },
+    data: {
+      category: category.toUpperCase(),
+      title,
+      description,
+      redirectUrl: redirectUrl || null,
+      publishDate: publishDate ? new Date(publishDate) : existing.publishDate,
+      endDate: endDate ? new Date(endDate) : null,
+      isActive: is_active === "on",
+    },
+  });
+
+  req.flash("success", "Notification updated successfully");
+  res.redirect("/admin/notifications");
+});
+
+const deleteNotification = asyncHandler(async (req, res) => {
+  const id = parseInt(req.params.id);
+
+  const item = await prisma.notification.findUnique({ where: { id } });
+  if (!item) {
+    req.flash("error", "Notification not found");
+    return res.redirect("/admin/notifications");
+  }
+
+  await prisma.notification.delete({ where: { id } });
+
+  req.flash("success", "Notification deleted successfully");
+  res.redirect("/admin/notifications");
+});
 
 module.exports = {
   showLogin,
@@ -784,4 +900,11 @@ module.exports = {
   editFacultyForm,
   updateFaculty,
   deleteFaculty,
+
+  listNotifications,
+  createNotificationForm,
+  createNotification,
+  editNotificationForm,
+  updateNotification,
+  deleteNotification,
 };
