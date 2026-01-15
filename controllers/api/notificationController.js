@@ -11,7 +11,7 @@ exports.getNotifications = async (req, res) => {
         publishDate: { lte: now }, // Only show if published
         OR: [
           { endDate: null }, // No expiry
-          { endDate: { gte: now } }, // Or not yet expired
+          // { endDate: { gte: now } }, // Or not yet expired
         ],
       },
       orderBy: { publishDate: "desc" },
