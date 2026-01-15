@@ -9,7 +9,6 @@ exports.uploadDocuments = async (req, res) => {
     }
     const { type } = req.params;
     const studentId = req.user.id ;
-    // const studentId = 2 ;
     
     const model =
       type.toLowerCase() === "bba"
