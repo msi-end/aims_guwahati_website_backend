@@ -86,7 +86,7 @@ app.use("/api/student", require("./routes/api/student"));
 app.use("/api/admission", require("./routes/api/applications"));
 app.use("/api/gallery", require("./routes/api/gallery"));
 app.use("/api/faculty", require("./routes/api/faculty"));
-app.get("/notifications", require("./routes/api/notifications"));
+app.use("/api/notifications", require("./routes/api/notifications"));
 
 app.get("/", (req, res) => res.redirect("/admin/login"));
 
