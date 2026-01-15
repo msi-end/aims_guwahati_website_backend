@@ -14,14 +14,14 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div class="space-y-1">
                 <label class="text-xs font-bold text-gray-400 uppercase">Full Name</label>
-                <input type="text" name="name" value="<%= typeof member !== 'undefined' ? member.name : '' %>" required
+                <input type="text" name="name" value="<%= typeof member !== 'undefined' ? member.name : '' %>" 
                     class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
 
             <div class="space-y-1">
                 <label class="text-xs font-bold text-gray-400 uppercase">Designation</label>
                 <input type="text" name="designation"
-                    value="<%= typeof member !== 'undefined' ? member.designation : '' %>" required
+                    value="<%= typeof member !== 'undefined' ? member.designation : '' %>" 
                     placeholder="e.g. Director"
                     class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
             </div>
@@ -29,7 +29,7 @@
             <div class="space-y-1">
                 <label class="text-xs font-bold text-gray-400 uppercase">Qualification</label>
                 <input type="text" name="qualification"
-                    value="<%= typeof member !== 'undefined' ? member.qualification : '' %>" required
+                    value="<%= typeof member !== 'undefined' ? member.qualification : '' %>" 
                     placeholder="Ph.D, MBA..."
                     class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
             </div>

@@ -5,18 +5,18 @@ meta {
 }
 
 put {
-  url: http://localhost:5000/api/admission/upload/:type/:id
+  url: {{URL}}/api/admission/upload/:type/:id
   body: multipartForm
   auth: bearer
 }
 
 params:path {
   type: bba
-  id: 3
+  id: 10
 }
 
 auth:bearer {
-  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InN0dWRlbnQiLCJhcHBsaWNhdGlvbk5vIjoiOTg3MjcxNzM0OSIsImlhdCI6MTc2ODI4MzIzNCwiZXhwIjoxNzY4Mjg2ODM0fQ.R7oS-Sl9WC-KZjYXk9Ff51qUKJU_xOaClj_g5Q7Tqpw
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsInJvbGUiOiJzdHVkZW50IiwiYXBwbGljYXRpb25ObyI6Ijc0NDA0Mzg5OTAiLCJpYXQiOjE3Njg0NTQ2NTYsImV4cCI6MTc2ODQ1ODI1Nn0.3M8aPu0nHyGt0IMXfNBZqQRPMXC9TF9J-gUP-BblM1k
 }
 
 body:multipart-form {
