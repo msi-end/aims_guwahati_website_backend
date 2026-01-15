@@ -225,14 +225,14 @@ model Faculty {
 }
 
 model Notification {
-  id          Int       @id @default(autoincrement())
-  category    String?    @default("General") 
+  id          Int      @id @default(autoincrement())
+  category    String?   @default("General") // e.g., "Exam Result", "Notice"
   title       String?
-  description String?    @db.Text
-  redirectUrl String?   @db.VarChar(500)
-  publishDate DateTime?  @default(now())
+  description String?   @db.Text
+  redirectUrl String?  @db.VarChar(500)
+  publishDate DateTime @default(now())
   endDate     DateTime?
-  isActive    String?   @default("true")
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
