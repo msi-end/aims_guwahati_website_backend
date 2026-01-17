@@ -8,8 +8,8 @@ exports.uploadDocuments = async (req, res) => {
       return sendError(res, "No files uploaded", null, 400);
     }
     const { type } = req.params;
-    const studentId = req.user.id ;
-    
+    const studentId = req.user.id;
+
     const model =
       type.toLowerCase() === "bba"
         ? prisma.bbaApplication
@@ -18,7 +18,7 @@ exports.uploadDocuments = async (req, res) => {
     const application = await model.findFirst({
       where: { studentId },
     });
-console.log(type,studentId,application);
+    console.log(type, studentId, application);
 
     if (!application) {
       req.files.forEach((f) => fs.unlinkSync(f.path));

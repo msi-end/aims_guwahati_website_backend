@@ -12,14 +12,15 @@ put {
 
 params:path {
   type: bba
-  id: 10
+  id: 2
 }
 
 auth:bearer {
-  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTAsInJvbGUiOiJzdHVkZW50IiwiYXBwbGljYXRpb25ObyI6Ijc0NDA0Mzg5OTAiLCJpYXQiOjE3Njg0NTQ2NTYsImV4cCI6MTc2ODQ1ODI1Nn0.3M8aPu0nHyGt0IMXfNBZqQRPMXC9TF9J-gUP-BblM1k
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6InN0dWRlbnQiLCJhcHBsaWNhdGlvbk5vIjoiODEyMDU5MjYyMiIsImlhdCI6MTc2ODY2ODAwNSwiZXhwIjoxNzY4NjcxNjA1fQ.8VYJmek6iCdccj8ZqN88aAKwmmBEbYbKRexw2SZPpbE
 }
 
 body:multipart-form {
-  photoUrl: @file(C:\Users\BS\Pictures\2nd.png) @contentType(jpg/png)
-  signatureUrl: @file(C:\Users\BS\Pictures\aso.png)
+  ~photoUrl: @file(C:\Users\BS\Pictures\2nd.png) @contentType(jpg/png)
+  ~signatureUrl: @file(C:\Users\BS\Pictures\aso.png)
+  ~paymentFileUrl: @file(C:\Users\BS\Downloads\Gemini_Generated_Image_j40bvpj40bvpj40b.png)
 }
