@@ -92,6 +92,21 @@ model BbaApplication {
   marksheetGradUrl    String? @db.VarChar(500)
   casteCertificateUrl String? @db.VarChar(500)
 
+  // Status Flags (Storing as String per your request)
+  isBpl              String? @default("No")
+  isPwd              String? @default("No")
+  isChronic          String? @default("No")
+  isPsychology       String? @default("No")
+  entranceExamStatus String? @default("Pending")
+
+  // File Upload Paths
+  bplFileUrl     String? @db.VarChar(500)
+  pwdFileUrl     String? @db.VarChar(500)
+  paymentFileUrl String? @db.VarChar(500)
+
+  // Payment Tracking
+  payStatusStudent String? @default("Unpaid")
+
   // --- 5. Status & Declaration ---
   declaration String?  @default("false")
   status      String   @default("pending")
@@ -180,6 +195,21 @@ model MbaApplication {
   marksheetGradUrl    String? @db.VarChar(500)
   casteCertificateUrl String? @db.VarChar(500)
 
+  // Status Flags (Storing as String per your request)
+  isBpl              String? @default("No")
+  isPwd              String? @default("No")
+  isChronic          String? @default("No")
+  isPsychology       String? @default("No")
+  entranceExamStatus String? @default("Pending")
+
+  // File Upload Paths
+  bplFileUrl     String? @db.VarChar(500)
+  pwdFileUrl     String? @db.VarChar(500)
+  paymentFileUrl String? @db.VarChar(500)
+
+  // Payment Tracking
+  payStatusStudent String? @default("Unpaid")
+
   // --- 5. Status & Declaration ---
   declaration String?  @default("false")
   status      String?  @default("pending")
@@ -225,14 +255,14 @@ model Faculty {
 }
 
 model Notification {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   category    String?   @default("General") // e.g., "Exam Result", "Notice"
   title       String?
   description String?   @db.Text
-  redirectUrl String?  @db.VarChar(500)
-  publishDate DateTime @default(now())
+  redirectUrl String?   @db.VarChar(500)
+  publishDate DateTime  @default(now())
   endDate     DateTime?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  isActive    Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
