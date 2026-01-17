@@ -69,7 +69,7 @@
                 <h3 class="font-bold text-gray-900 mb-4 flex items-center">
                     <i class="fas fa-edit mr-2 text-blue-500"></i> Update Status
                 </h3>
-                <form action="/admin/admissions/<%= isMba ? 'mba' : 'bba' %>/<%= admission.id %>/update" method="POST" class="space-y-4">
+                <form action="/admin/admissions/<%= isMba ? 'mba' : 'bba' %>/<%= admission.id %>/status" method="POST" class="space-y-4">
                     <div>
                         <label class="text-[10px] font-bold text-gray-400 uppercase">Admission Status</label>
                         <select name="status" class="w-full mt-1 p-2 border rounded-lg bg-gray-50 text-sm">
@@ -78,14 +78,14 @@
                             <option value="rejected" <%= admission.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
                         </select>
                     </div>
-                    <div>
+                    <!-- <div>
                         <label class="text-[10px] font-bold text-gray-400 uppercase">Entrance Exam Status</label>
                         <select name="entranceExamStatus" class="w-full mt-1 p-2 border rounded-lg bg-gray-50 text-sm">
                             <option value="Pending" <%= admission.entranceExamStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
                             <option value="Qualified" <%= admission.entranceExamStatus === 'Qualified' ? 'selected' : '' %>>Qualified</option>
                             <option value="Not Qualified" <%= admission.entranceExamStatus === 'Not Qualified' ? 'selected' : '' %>>Not Qualified</option>
                         </select>
-                    </div>
+                    </div> -->
                     <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-100">
                         Save Changes
                     </button>
