@@ -5,14 +5,20 @@ meta {
 }
 
 post {
-  url: https://aims.reynrel.in/api/student/login
+  url: {{URL}}/api/student/login
   body: json
   auth: inherit
 }
 
 body:json {
+  // {
+  //   "applicationNo": "9872717349",
+  //   "password": "msi"
+  // }
+  
+  
   {
-    "applicationNo": "7440438990",
-    "password": "aims_guwahati_website_backend"
+   "email": "jane.does@example.com",
+    "password": "msi"
   }
 }

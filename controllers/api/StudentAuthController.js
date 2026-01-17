@@ -84,9 +84,18 @@ exports.registerStudent = async (req, res) => {
 // POST /api/student/login
 exports.loginStudent = async (req, res) => {
   try {
-    const { applicationNo, password } = req.body;
-    const student = await prisma.student.findUnique({
-      where: { applicationNo },
+    const { applicationNo, email, password } = req.body;
+
+    if (!applicationNo && !email && !password) {
+      return sendError(res, "Please provide Application No/Email and Password", null, 400);
+    }
+    const student = await prisma.student.findFirst({
+      where: {
+        OR: [
+          { applicationNo },
+          { email }
+        ],
+      },
     });
 
     if (!student) {
@@ -111,6 +120,7 @@ exports.loginStudent = async (req, res) => {
       student: {
         id: student.id,
         applicationNo: student.applicationNo,
+        email: student.email,
         courseType: student.selectedCourse,
         fullName: student.fullName,
         paymentStatus: student.paymentStatus,
