@@ -1,33 +1,43 @@
-const {prisma} = require("../../config/db");
+const { prisma } = require("../../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { sendSuccess, sendError } = require("../../utils/apiResponse");
 
-// Helper function to generate 10-digit Application Number
-const generateApplicationNo = () => {
-  return Math.floor(1000000000 + Math.random() * 9000000000).toString();
-};
+
 
 exports.registerStudent = async (req, res) => {
   try {
     const { fullName, email, mobileNumber, password, courseType } = req.body;
 
+    // 1. Check for existing student
     const existingStudent = await prisma.student.findFirst({
-      where: {
-        OR: [{ email }, { mobileNumber }],
-      },
+      where: { OR: [{ email }, { mobileNumber }] },
     });
+
     if (existingStudent) {
-      return sendError(res, "Email or Mobile Number already registered", null, 400);
+      return sendError(res,"Email or Mobile Number already registered",null,400,);
     }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
-    let applicationNo = generateApplicationNo();
-    const checkId = await prisma.student.findUnique({ where: { applicationNo } });
-    if (checkId) applicationNo = generateApplicationNo();
-
     const result = await prisma.$transaction(async (tx) => {
-      // Create the Student
+      const prefix = courseType === "MBA" ? "0126001" : "0226001";
+      const startRange = `${prefix}0`; // Search pattern
+
+      const lastStudent = await tx.student.findFirst({
+        where: {
+          applicationNo: { startsWith: prefix },
+        },
+        orderBy: { applicationNo: "desc" },
+      });
+
+      let nextSequence = 1;
+      if (lastStudent) {
+        const lastSerial = parseInt(lastStudent.applicationNo.slice(-3));
+        nextSequence = lastSerial + 1;
+      }
+
+      const applicationNo = `${prefix}${nextSequence.toString().padStart(3, "0")}`;
       const student = await tx.student.create({
         data: {
           applicationNo,
@@ -35,7 +45,7 @@ exports.registerStudent = async (req, res) => {
           email,
           mobileNumber,
           password: hashedPassword,
-          selectedCourse: courseType || null, 
+          selectedCourse: courseType || null,
         },
       });
 
@@ -61,20 +71,21 @@ exports.registerStudent = async (req, res) => {
       }
       return { student, applicationDetails };
     });
+
     const token = jwt.sign(
       { id: result.student.id, applicationNo: result.student.applicationNo },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1h" },
     );
 
     const { password: _, ...studentData } = result.student;
-
-    return sendSuccess(res, "Registration and Course Initialization successful", {
-      token,
-      student: studentData,
-      application: result.applicationDetails,
-    }, 201);
-
+    return sendSuccess(res,"Registration successful",{
+        token,
+        student: studentData,
+        application: result.applicationDetails,
+      },
+      201,
+    );
   } catch (error) {
     console.error("Registration Error:", error);
     return sendError(res, error.message);
@@ -87,14 +98,16 @@ exports.loginStudent = async (req, res) => {
     const { applicationNo, email, password } = req.body;
 
     if (!applicationNo && !email && !password) {
-      return sendError(res, "Please provide Application No/Email and Password", null, 400);
+      return sendError(
+        res,
+        "Please provide Application No/Email and Password",
+        null,
+        400,
+      );
     }
     const student = await prisma.student.findFirst({
       where: {
-        OR: [
-          { applicationNo },
-          { email }
-        ],
+        OR: [{ applicationNo }, { email }],
       },
     });
 
@@ -112,7 +125,7 @@ exports.loginStudent = async (req, res) => {
     const token = jwt.sign(
       { id: student.id, role: "student", applicationNo: student.applicationNo },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      { expiresIn: "1h" },
     );
 
     return sendSuccess(res, "Login successful", {
@@ -143,7 +156,7 @@ exports.initializeCourse = async (req, res) => {
         res,
         "Invalid course selection. Choose BBA or MBA.",
         null,
-        400
+        400,
       );
     }
 
@@ -160,7 +173,7 @@ exports.initializeCourse = async (req, res) => {
         res,
         "You have already submitted an application.",
         null,
-        400
+        400,
       );
     }
     const existingDraft =
@@ -219,7 +232,7 @@ exports.initializeCourse = async (req, res) => {
       res,
       `${courseType} application initialized`,
       result,
-      201
+      201,
     );
   } catch (error) {
     console.error("Initialization Error:", error);
