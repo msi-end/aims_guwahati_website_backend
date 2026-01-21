@@ -640,7 +640,6 @@ const listFaculty = asyncHandler(async (req, res) => {
     currentPath: req.path,
   });
 });
-
 const createFacultyForm = asyncHandler(async (req, res) => {
   res.render("admin/faculty/edit", {
     layout: "layouts/main",
@@ -648,7 +647,6 @@ const createFacultyForm = asyncHandler(async (req, res) => {
     currentPath: req.path,
   });
 });
-
 const createFaculty = asyncHandler(async (req, res) => {
   if (!req.file) {
     req.flash("error", "Profile image is required");
@@ -671,7 +669,6 @@ const createFaculty = asyncHandler(async (req, res) => {
   req.flash("success", "Faculty member added successfully");
   res.redirect("/admin/faculty");
 });
-
 const editFacultyForm = asyncHandler(async (req, res) => {
   const member = await prisma.faculty.findUnique({
     where: { id: parseInt(req.params.id) },
@@ -689,7 +686,6 @@ const editFacultyForm = asyncHandler(async (req, res) => {
     currentPath: req.path,
   });
 });
-
 const updateFaculty = asyncHandler(async (req, res) => {
   const id = parseInt(req.params.id);
   const existing = await prisma.faculty.findUnique({
@@ -725,7 +721,6 @@ const updateFaculty = asyncHandler(async (req, res) => {
   req.flash("success", "Faculty details updated successfully");
   res.redirect("/admin/faculty");
 });
-
 const deleteFaculty = asyncHandler(async (req, res) => {
   const id = parseInt(req.params.id);
   const member = await prisma.faculty.findUnique({
@@ -777,14 +772,12 @@ const listNotifications = asyncHandler(async (req, res) => {
     currentPath: req.path,
   });
 });
-
 const createNotificationForm = asyncHandler(async (req, res) => {
   res.render("admin/notifications/create", {
     layout: "layouts/main",
     isAuthenticated: true,
   });
 });
-
 const createNotification = asyncHandler(async (req, res) => {
   const { category, title, description, redirectUrl, publishDate, endDate } =
     req.body;
@@ -804,7 +797,6 @@ const createNotification = asyncHandler(async (req, res) => {
   req.flash("success", "Notification published successfully");
   res.redirect("/admin/notifications");
 });
-
 const editNotificationForm = asyncHandler(async (req, res) => {
   const item = await prisma.notification.findUnique({
     where: { id: parseInt(req.params.id) },
@@ -821,7 +813,6 @@ const editNotificationForm = asyncHandler(async (req, res) => {
     item,
   });
 });
-
 const updateNotification = asyncHandler(async (req, res) => {
   const id = parseInt(req.params.id);
   const {
@@ -856,7 +847,6 @@ const updateNotification = asyncHandler(async (req, res) => {
   req.flash("success", "Notification updated successfully");
   res.redirect("/admin/notifications");
 });
-
 const deleteNotification = asyncHandler(async (req, res) => {
   const id = parseInt(req.params.id);
 
@@ -871,6 +861,132 @@ const deleteNotification = asyncHandler(async (req, res) => {
   req.flash("success", "Notification deleted successfully");
   res.redirect("/admin/notifications");
 });
+
+
+// 1. List all placement records
+const listPlacements = asyncHandler(async (req, res) => {
+  const placements = await prisma.placementRecord.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+
+  res.render("admin/placements/list", {
+    layout: "layouts/main",
+    isAuthenticated: true,
+    placements,
+    currentPath: req.path,
+  });
+});
+
+// 2. Render the "Add New" form
+const createPlacementForm = asyncHandler(async (req, res) => {
+  res.render("admin/placements/edit", {
+    layout: "layouts/main",
+    isAuthenticated: true,
+    record: null, // Passing null so the same form can be used for Create/Edit
+    currentPath: req.path,
+  });
+});
+
+// 3. Process the creation of a new record
+const createPlacement = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    req.flash("error", "Student photo is required");
+    return res.redirect("/admin/placements/create");
+  }
+  const { studentName, companyName, designation, package, batchYear, isActive } = req.body;
+  await prisma.placementRecord.create({
+    data: {
+      studentName,
+      companyName,
+      designation,
+      package,
+      batchYear,
+      isActive: (isActive === "on" || isActive === true) ? "Yes" : "No",
+      photoUrl: `/uploads/placements/${req.file.filename}`,
+    },
+  });
+  req.flash("success", "Placement record added successfully");
+  res.redirect("/admin/placements");
+});
+
+// 4. Render the Edit form
+const editPlacementForm = asyncHandler(async (req, res) => {
+  const record = await prisma.placementRecord.findUnique({
+    where: { id: parseInt(req.params.id) },
+  });
+  if (!record) {
+    req.flash("error", "Placement record not found");
+    return res.redirect("/admin/placements");
+  }
+  res.render("admin/placements/edit", {
+    layout: "layouts/main",
+    isAuthenticated: true,
+    record,
+    currentPath: req.path,
+  });
+});
+
+// 5. Process the update of an existing record
+const updatePlacement = asyncHandler(async (req, res) => {
+  const id = parseInt(req.params.id);
+  const existing = await prisma.placementRecord.findUnique({
+    where: { id },
+  });
+
+  if (!existing) {
+    req.flash("error", "Placement record not found");
+    return res.redirect("/admin/placements");
+  }
+
+  const { studentName, companyName, designation, package, batchYear, isActive } = req.body;
+  const updateData = {
+    studentName,
+    companyName,
+    designation,
+    package,
+    batchYear,
+    isActive: (isActive === "on" || isActive === "true" || isActive === true) ? "Yes" : "No",  };
+
+  if (req.file) {
+    // Delete old photo if a new one is uploaded
+    if (existing.photoUrl) {
+      deleteFile(path.join(__dirname, "../../public", existing.photoUrl));
+    }
+    updateData.photoUrl = `/uploads/placements/${req.file.filename}`;
+  }
+
+  await prisma.placementRecord.update({
+    where: { id },
+    data: updateData,
+  });
+
+  req.flash("success", "Placement details updated successfully");
+  res.redirect("/admin/placements");
+});
+
+// 6. Delete a record and its associated photo
+const deletePlacement = asyncHandler(async (req, res) => {
+  const id = parseInt(req.params.id);
+  const record = await prisma.placementRecord.findUnique({
+    where: { id },
+  });
+
+  if (!record) {
+    req.flash("error", "Placement record not found");
+    return res.redirect("/admin/placements");
+  }
+
+  if (record.photoUrl) {
+    deleteFile(path.join(__dirname, "../../public", record.photoUrl));
+  }
+
+  await prisma.placementRecord.delete({ where: { id } });
+
+  req.flash("success", "Placement record removed successfully");
+  res.redirect("/admin/placements");
+});
+
+
 
 module.exports = {
   showLogin,
@@ -907,4 +1023,11 @@ module.exports = {
   editNotificationForm,
   updateNotification,
   deleteNotification,
+
+  listPlacements,
+  createPlacementForm,
+  createPlacement,
+  editPlacementForm,
+  updatePlacement,
+  deletePlacement,
 };

@@ -182,10 +182,11 @@ model MbaApplication {
   academicRows       String? @db.Text
   workExperienceRows String? @db.Text
 
-  cgpa              String?
-  conversionFormula String?
-  extraCurricular   String? @db.Text
-  hasWorkExperience String? @default("no")
+  cgpa                  String?
+  conversionFormula     String?
+  extraCurricular       String? @db.Text
+  hasWorkExperience     String? @default("no")
+  experienceCertificate String? @db.VarChar(500)
 
   // --- 4. Documents Data (Paths) ---
   photoUrl            String? @db.VarChar(500)
@@ -265,4 +266,19 @@ model Notification {
   isActive    Boolean   @default(true)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+}
+
+
+model PlacementRecord {
+  id          Int      @id @default(autoincrement())
+  studentName String?   @db.VarChar(255)
+  photoUrl    String?   @db.VarChar(500)
+  companyName String?  @db.VarChar(255)
+  designation String?  @db.VarChar(255) 
+  package     String?  @db.VarChar(50)  
+  batchYear   String?  @db.VarChar(20)  
+  isActive    String?  @default("true")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
 }

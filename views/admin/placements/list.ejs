@@ -1,0 +1,65 @@
+<div class="p-6">
+    <div class="flex justify-between items-center mb-6">
+        <div>
+            <h1 class="text-2xl font-bold text-gray-800">Placement Records</h1>
+            <p class="text-sm text-gray-500">Manage student success stories and company placements.</p>
+        </div>
+        <a href="/admin/placements/create" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition flex items-center">
+            <i class="fas fa-plus mr-2"></i> Add New Placement
+        </a>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-gray-50 border-b">
+                <tr>
+                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Student</th>
+                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Company & Role</th>
+                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Package/Batch</th>
+                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Status</th>
+                    <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y">
+                <% placements.forEach(item => { %>
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4">
+                        <div class="flex items-center">
+                            <img src="<%= item.photoUrl %>" class="w-10 h-10 rounded-full object-cover border mr-3" alt="Student Photo">
+                            <span class="font-bold text-gray-800"><%= item.studentName %></span>
+                        </div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm font-bold text-gray-800"><%= item.companyName %></div>
+                        <div class="text-xs text-gray-500"><%= item.designation %></div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-gray-800"><%= item.package || 'N/A' %></div>
+                        <div class="text-[10px] font-bold text-blue-600 uppercase"><%= item.batchYear %></div>
+                    </td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 rounded-full text-[10px] font-black uppercase <%= item.isActive ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' %>">
+                            <%= item.isActive ? 'Active' : 'Hidden' %>
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-right space-x-2">
+                        <a href="/admin/placements/edit/<%= item.id %>" class="text-blue-600 hover:text-blue-800 transition">
+                            <i class="fas fa-edit"></i>
+                        </a>
+                        <form action="/admin/placements/delete/<%= item.id %>" method="POST" class="inline" onsubmit="return confirm('Delete this record?')">
+                            <button type="submit" class="text-red-500 hover:text-red-700 transition">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                <% }) %>
+                <% if (placements.length === 0) { %>
+                <tr>
+                    <td colspan="5" class="px-6 py-10 text-center text-gray-400 italic">No placement records found.</td>
+                </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</div>

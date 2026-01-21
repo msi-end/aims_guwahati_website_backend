@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const adminController = require('../controllers/adminController');
 const { isAuthenticated, isGuest } = require('../middleware/adminAuth');
-const { uploadPassportMiddleware, uploadGalleryMiddleware } = require('../middleware/upload');
+const { uploadPassportMiddleware, uploadGalleryMiddleware, uploadPlacementRecordsMiddleware } = require('../middleware/upload');
 
 // Authentication routes
 router.get('/login', isGuest, adminController.showLogin);
@@ -52,5 +52,12 @@ router.get('/notifications/edit/:id', adminController.editNotificationForm);
 router.post('/notifications/update/:id', adminController.updateNotification);
 router.post('/notifications/delete/:id', adminController.deleteNotification);
 
+
+router.get("/placements", adminController.listPlacements);
+router.get("/placements/create", adminController.createPlacementForm);
+router.post("/placements/create", uploadPlacementRecordsMiddleware, adminController.createPlacement);
+router.get("/placements/edit/:id", adminController.editPlacementForm);
+router.post("/placements/edit/:id", uploadPlacementRecordsMiddleware, adminController.updatePlacement);
+router.post("/placements/delete/:id", adminController.deletePlacement);
     
 module.exports = router;

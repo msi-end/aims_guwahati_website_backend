@@ -1,15 +1,15 @@
 <aside class="fixed top-0 left-0 z-40 w-64 h-screen transition-transform -translate-x-full lg:translate-x-0" id="sidebar">
   <div class="h-full px-3 py-4 overflow-y-auto bg-gradient-to-b from-blue-900 to-blue-800 shadow-xl">
-    
+
     <!-- Logo -->
     <div class="flex items-center mb-8 px-2">
       <i class="fas fa-graduation-cap text-white text-3xl mr-3"></i>
       <span class="text-xl font-bold text-white">School Admin</span>
     </div>
-    
+
     <!-- Navigation -->
     <ul class="space-y-2">
-      
+
       <!-- Dashboard -->
       <!-- <li>
         <a href="/admin/dashboard" 
@@ -18,20 +18,18 @@
           <span class="ml-3">Dashboard</span>
         </a>
       </li> -->
-      
+
       <!-- Admissions -->
       <li>
-        <a href="/admin/admissions" 
-           class="flex items-center p-3 rounded-lg text-white hover:bg-blue-700 transition <%= currentPath && currentPath.includes('/admissions') ? 'bg-blue-700' : '' %>">
+        <a href="/admin/admissions" class="flex items-center p-3 rounded-lg text-white hover:bg-blue-700 transition <%= currentPath && currentPath.includes('/admissions') ? 'bg-blue-700' : '' %>">
           <i class="fas fa-user-graduate w-5"></i>
           <span class="ml-3">Admissions</span>
         </a>
       </li>
-      
+
       <!-- Gallery -->
       <li>
-        <a href="/admin/gallery" 
-           class="flex items-center p-3 rounded-lg text-white hover:bg-blue-700 transition <%= currentPath && currentPath.includes('/gallery') ? 'bg-blue-700' : '' %>">
+        <a href="/admin/gallery" class="flex items-center p-3 rounded-lg text-white hover:bg-blue-700 transition <%= currentPath && currentPath.includes('/gallery') ? 'bg-blue-700' : '' %>">
           <i class="fas fa-images w-5"></i>
           <span class="ml-3">Gallery</span>
         </a>
@@ -40,42 +38,44 @@
       <!-- faculty section -->
 
       <li>
-        <a href="/admin/faculty" 
-           class="flex items-center p-3 rounded-lg text-white hover:bg-blue-700 transition <%= currentPath && currentPath.includes('/faculty') ? 'bg-blue-700' : '' %>">
+        <a href="/admin/faculty" class="flex items-center p-3 rounded-lg text-white hover:bg-blue-700 transition <%= currentPath && currentPath.includes('/faculty') ? 'bg-blue-700' : '' %>">
           <i class="fas fa-users w-5"></i>
           <span class="ml-3">Faculty</span>
         </a>
       </li>
-       <li>
-        <a href="/admin/notifications" 
-           class="flex items-center p-3 rounded-lg text-white hover:bg-blue-700 transition <%= currentPath && currentPath.includes('/notifications') ? 'bg-blue-700' : '' %>">
+      <li>
+        <a href="/admin/notifications" class="flex items-center p-3 rounded-lg text-white hover:bg-blue-700 transition <%= currentPath && currentPath.includes('/notifications') ? 'bg-blue-700' : '' %>">
           <i class="fas fa-bell w-5"></i>
           <span class="ml-3">Notifications</span>
         </a>
       </li>
-      
+       <li>
+        <a href="/admin/placements" class="flex items-center p-3 rounded-lg text-white hover:bg-blue-700 transition <%= currentPath && currentPath.includes('/placements') ? 'bg-blue-700' : '' %>">
+          <i class="fas fa-bell w-5"></i>
+          <span class="ml-3">Placements</span>
+        </a>
+      </li>
+
       <!-- Divider -->
       <li class="pt-4 mt-4 border-t border-blue-700"></li>
-      
+
       <!-- Settings -->
       <li>
-        <a href="/admin/settings" 
-           class="flex items-center p-3 rounded-lg text-white hover:bg-blue-700 transition">
+        <a href="/admin/settings" class="flex items-center p-3 rounded-lg text-white hover:bg-blue-700 transition">
           <i class="fas fa-cog w-5"></i>
           <span class="ml-3">Settings</span>
         </a>
       </li>
-      
+
       <!-- Logout -->
       <li>
-        <a href="/admin/logout" 
-           class="flex items-center p-3 rounded-lg text-white hover:bg-red-600 transition">
+        <a href="/admin/logout" class="flex items-center p-3 rounded-lg text-white hover:bg-red-600 transition">
           <i class="fas fa-sign-out-alt w-5"></i>
           <span class="ml-3">Logout</span>
         </a>
       </li>
     </ul>
-    
+
     <!-- User Info -->
     <div class="absolute bottom-4 left-0 right-0 px-6">
       <div class="bg-blue-700 rounded-lg p-3">
@@ -90,7 +90,7 @@
         </div>
       </div>
     </div>
-    
+
   </div>
 </aside>
 
