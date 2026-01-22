@@ -6,7 +6,7 @@ exports.getPlacements = async (req, res) => {
   try {
     const placements = await prisma.placementRecord.findMany({
       where: {
-        isActive: "true", // Only show students whose records are marked as active
+        isActive: "Yes", // Only show students whose records are marked as active
       },
       orderBy: {
         createdAt: "desc", // Show newest placements first
