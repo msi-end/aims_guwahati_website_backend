@@ -2,6 +2,8 @@ const { prisma } = require("../../config/db");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { sendSuccess, sendError } = require("../../utils/apiResponse");
+const crypto = require("crypto");
+// const { sendEmail } = require("../../utils/emailHelper"); // You'll need an email utility
 
 
 
@@ -237,5 +239,66 @@ exports.initializeCourse = async (req, res) => {
   } catch (error) {
     console.error("Initialization Error:", error);
     return sendError(res, "Could not start application: " + error.message);
+  }
+};
+
+
+exports.forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    const student = await prisma.student.findUnique({ where: { email } });
+    if (!student) {
+      return sendSuccess(res, "If that email exists, an OTP has been sent.");
+    }
+
+    // Generate a 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expires = new Date(Date.now() + 10 * 60 * 1000); // Valid for 10 mins
+
+    await prisma.student.update({
+      where: { email },
+      data: {
+        resetPasswordOTP: otp,
+        resetPasswordExpires: expires,
+      },
+    });
+
+    // await sendEmail(email, "Password Reset OTP", `Your OTP is ${otp}`);
+
+    console.log(`OTP for ${email}: ${otp}`); // Temporary for testing
+
+    return sendSuccess(res, "Password reset OTP sent to your email.");
+  } catch (error) {
+    return sendError(res, error.message);
+  }
+};
+
+exports.resetPassword = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    const student = await prisma.student.findFirst({
+      where: {
+        email,
+        resetPasswordOTP: otp,
+        resetPasswordExpires: { gt: new Date() }, 
+      },
+    });
+    if (!student) {
+      return sendError(res, "Invalid OTP or OTP has expired", null, 400);
+    }
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    await prisma.student.update({
+      where: { id: student.id },
+      data: {
+        password: hashedPassword,
+        resetPasswordOTP: null,
+        resetPasswordExpires: null,
+      },
+    });
+    return sendSuccess(res, "Password has been reset successfully. You can now login.");
+  } catch (error) {
+    return sendError(res, error.message);
   }
 };

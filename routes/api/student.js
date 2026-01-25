@@ -10,6 +10,8 @@ router.post("/register", studentController.registerStudent);
 router.post("/login", studentController.loginStudent);
 router.post("/initialize-course", authMiddleware, studentController.initializeCourse);
 
+router.post("/forgot-password", studentController.forgotPassword);
+router.post("/reset-password", studentController.resetPassword);
 
 // Protected Routes (Requires JWT)
 router.get("/me", (req, res) => {

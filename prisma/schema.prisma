@@ -17,10 +17,12 @@ model Student {
   password      String @db.VarChar(255)
 
   // Tracking Fields
-  createdAt       DateTime @default(now())
-  paymentStatus   String   @default("pending")
-  isFormSubmitted Boolean  @default(false)
-  selectedCourse  String?
+  createdAt            DateTime  @default(now())
+  paymentStatus        String    @default("pending")
+  isFormSubmitted      Boolean   @default(false)
+  selectedCourse       String?
+  resetPasswordOTP     String?
+  resetPasswordExpires DateTime?
 
   bbaApplications BbaApplication[]
   mbaApplications MbaApplication[]
@@ -268,17 +270,15 @@ model Notification {
   updatedAt   DateTime  @updatedAt
 }
 
-
 model PlacementRecord {
   id          Int      @id @default(autoincrement())
-  studentName String?   @db.VarChar(255)
-  photoUrl    String?   @db.VarChar(500)
+  studentName String?  @db.VarChar(255)
+  photoUrl    String?  @db.VarChar(500)
   companyName String?  @db.VarChar(255)
-  designation String?  @db.VarChar(255) 
-  package     String?  @db.VarChar(50)  
-  batchYear   String?  @db.VarChar(20)  
+  designation String?  @db.VarChar(255)
+  package     String?  @db.VarChar(50)
+  batchYear   String?  @db.VarChar(20)
   isActive    String?  @default("true")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
-
 }
