@@ -1,0 +1,168 @@
+<% 
+  // 1. Determine Type
+  const isMba = !!admission.firstName; 
+  
+  // 2. Helper: Name Logic
+  const displayName = isMba 
+    ? [admission.firstName, admission.middleName, admission.lastName].filter(Boolean).join(' ') 
+    : (admission.fullName || 'N/A'); 
+
+  // 3. Helper: JSON Parser for MBA Arrays
+  const safeParse = (str) => {
+    try { return (str && typeof str === 'string') ? JSON.parse(str) : []; } 
+    catch(e) { return []; }
+  };
+%>
+
+
+<style>
+  .font-bold {
+    font-weight: 900;
+  }
+
+  .text-\[9px\] {
+    font-size: 10px;
+  }
+</style>
+<% if (isMba) { %>
+<%- include('./courseTypeView/mba-view.ejs', { admission, courseType }) %>
+                                            
+<% } else { %>
+<%- include('./courseTypeView/bba-view.ejs', { admission, courseType}) %>
+<% } %>
+
+<script>
+  function printPDF() {
+    const content = document.getElementById("printArea").innerHTML;
+
+    const win = window.open("", "", "width=900,height=650");
+
+    win.document.write(`
+    <html>
+
+ <head>
+   <title>MBA Application</title>
+
+   <!-- Tailwind (optional but keeps layout) -->
+   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+   <style>
+     body {
+       background: white !important;
+       font-family: Arial, sans-serif;
+     }
+
+     /* Hide unwanted elements */
+     button,
+     nav,
+     form {
+       display: none !important;
+     }
+
+     /* Remove shadows & colors for clean PDF */
+     * {
+       box-shadow: none !important;
+     }
+
+     .bg-gray-50,
+     .bg-gray-100,
+     .bg-indigo-50,
+     .bg-red-50 {
+       background: white !important;
+     }
+
+     /* Page setup */
+     @page {
+       size: A3;
+       margin: 15mm;
+     }
+
+     /* Avoid breaking cards */
+     // section, .rounded-2xl {
+     //   page-break-inside: avoid;
+     // }
+
+     /* Tables */
+     // table {
+     //   page-break-inside: auto;
+     // }
+     tr {
+       page-break-inside: avoid;
+       page-break-after: auto;
+     }
+
+       /* Main grid layout */
+       .print-profile {
+         display: grid !important;
+         grid-template-columns: 300px 1fr;
+         gap: 16px;
+         text-align: left !important;
+         padding: 12px !important;
+         height:300px;
+       }
+
+       /* Center image vertically */
+       .print-profile .relative {
+         display: flex;
+         align-items: center;
+         justify-content: center;
+       }
+
+       /* Image box smaller for print */
+       .print-profile .w-40 {
+         width: 400px !important;
+       }
+
+       .print-profile .h-48 {
+         height: 250px !important;
+       }
+
+       /* Name + contact align */
+       .print-profile h2,
+       .print-profile p {
+         margin-top: 0 !important;
+       }
+
+        .print-profile p {
+         position: relative;
+    top: -190px;
+       }
+       /* Move details next to name */
+       .print-profile>h2,
+       .print-profile>p,
+       .print-profile>div:not(.relative) {
+         grid-column: 2;
+       }
+
+       /* Inner info grid stays grid */
+       .print-profile .grid {
+         grid-template-columns: repeat(2, 1fr) !important;
+         gap: 12px;
+         position: relative;
+    top: -190px;
+       }
+
+       /* Remove visual noise */
+       .shadow-sm {
+         box-shadow: none !important;
+       }
+
+       /* Prevent page break */
+       .print-profile {
+         page-break-inside: avoid;
+       }
+    
+   </style>
+ </head>
+
+ <body>
+   ${content}
+ </body>
+
+ </html>
+  `);
+
+    win.document.close();
+    win.focus();
+    win.print();
+  }
+</script>

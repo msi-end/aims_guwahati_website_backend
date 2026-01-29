@@ -304,7 +304,7 @@ const viewAdmission = asyncHandler(async (req, res) => {
   }
 
   // 5. Render the view
-  res.render("admin/admissions/view", {
+  res.render("admin/admissions/view_new", {
     layout: "layouts/main",
     isAuthenticated: true,
     admission,

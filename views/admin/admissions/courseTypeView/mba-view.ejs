@@ -30,7 +30,7 @@
   <div class="flex flex-col md:flex-row justify-between mb-8 border-b bg-white p-6 rounded-2xl shadow-sm">
     <div class="space-y-1">
       <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tighter">
-        <%= isMba ? 'MBA' : 'BBA' %> FULL APPLICATION RECORD
+        <%= isMba ? 'MBA' : 'BBA' %> FULL APPLICATION RECORD adadf
       </h1>
       <div class="flex gap-4 text-xs font-mono text-gray-500 uppercase">
         <span>App No: <b class="text-gray-900"><%= admission.student?.applicationNo || 'N/A' %></b></span>
@@ -228,34 +228,62 @@
                 <th class="p-3 text-right">Percentage/CGPA</th>
               </tr>
             </thead>
-      <tbody class="divide-y">
-              <% if(isMba) { %>
-                <% safeParse(admission.academicRows).forEach(row => { %>
-                  <tr>
-                    <td class="p-4 font-bold text-gray-900"><%= row.exam %></td>
-                    <td class="p-4"><%= row.board %> <br/> <small class="text-gray-400"><%= row.institution %></small></td>
-                    <td class="p-4 text-center"><%= row.year %></td>
-                    <td class="p-4 text-center"><%= row.marksObtained %> / <%= row.maxMarks %></td>
-                    <td class="p-4 text-right font-black text-blue-600"><%= row.percentage %>%</td>
-                  </tr>
-                <% }) %>
-              <% } else { %>
-                <tr>
-                  <td class="p-4 font-bold">10th (HSLC)</td>
-                  <td class="p-4"><%= admission.c10Board %> <br/> <small><%= admission.c10School %></small></td>
-                  <td class="p-4 text-center"><%= admission.c10Year %></td>
-                  <td class="p-4 text-center"><%= admission.c10MarksObt %> / <%= admission.c10MaxMarks %></td>
-                  <td class="p-4 text-right font-black text-blue-600"><%= admission.c10Percentage %>%</td>
-                </tr>
-                <tr>
-                  <td class="p-4 font-bold">12th (HS)</td>
-                  <td class="p-4"><%= admission.c12Board %> <br/> <small><%= admission.c12School %></small></td>
-                  <td class="p-4 text-center"><%= admission.c12Year %></td>
-                  <td class="p-4 text-center"><%= admission.c12MarksObt %> / <%= admission.c12MaxMarks %></td>
-                  <td class="p-4 text-right font-black text-blue-600"><%= admission.c12Percentage %>%</td>
-                </tr>
-              <% } %>
-            </tbody>
+           <tbody class="divide-y">
+  <% 
+    // Helper: Parse the MBA academicRows JSON string
+    let academicRows = [];
+    try {
+      if (admission.academicRows) {
+        academicRows = JSON.parse(admission.academicRows);
+      }
+    } catch (e) {
+      academicRows = [];
+    }
+  %>
+
+  <% if (academicRows.length > 0) { %>
+    <% academicRows.forEach(row => { %>
+      <tr class="hover:bg-gray-50 transition-colors">
+        <td class="p-4 font-bold text-gray-900">
+          <%= row.exam || 'N/A' %>
+        </td>
+        
+        <td class="p-4">
+          <div class="font-medium text-gray-800"><%= row.board || 'N/A' %></div>
+          <div class="text-[10px] text-gray-500 uppercase tracking-tight">
+            <%= row.institution || 'Institution N/A' %>
+          </div>
+        </td>
+        
+        <td class="p-4 text-center font-semibold text-gray-700">
+          <%= row.year || '—' %>
+        </td>
+        
+        <td class="p-4 text-center text-gray-600">
+          <% if(row.marksObtained && row.maxMarks) { %>
+            <%= row.marksObtained %> / <%= row.maxMarks %>
+          <% } else if (row.marksObtained || row.maxMarks) { %>
+            <%= row.marksObtained %><%= row.maxMarks %>
+          <% } else { %>
+            <span class="text-gray-300">Not Provided</span>
+          <% } %>
+        </td>
+        
+        <td class="p-4 text-right">
+          <span class="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-700 font-black text-sm">
+            <%= row.percentage %><% if(row.percentage && !isNaN(row.percentage) && row.percentage > 10) { %>%<% } %>
+          </span>
+        </td>
+      </tr>
+    <% }) %>
+  <% } else { %>
+    <tr>
+      <td colspan="5" class="p-8 text-center text-gray-400 italic">
+        No academic records found in the database.
+      </td>
+    </tr>
+  <% } %>
+</tbody>
 
           </table>
 
@@ -361,139 +389,3 @@
     </div>
   </div>
 </div>
-
-<script>
-  function printPDF() {
-    const content = document.getElementById("printArea").innerHTML;
-
-    const win = window.open("", "", "width=900,height=650");
-
-    win.document.write(`
-    <html>
-
- <head>
-   <title>MBA Application</title>
-
-   <!-- Tailwind (optional but keeps layout) -->
-   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-   <style>
-     body {
-       background: white !important;
-       font-family: Arial, sans-serif;
-     }
-
-     /* Hide unwanted elements */
-     button,
-     nav,
-     form {
-       display: none !important;
-     }
-
-     /* Remove shadows & colors for clean PDF */
-     * {
-       box-shadow: none !important;
-     }
-
-     .bg-gray-50,
-     .bg-gray-100,
-     .bg-indigo-50,
-     .bg-red-50 {
-       background: white !important;
-     }
-
-     /* Page setup */
-     @page {
-       size: A3;
-       margin: 15mm;
-     }
-
-     /* Avoid breaking cards */
-     // section, .rounded-2xl {
-     //   page-break-inside: avoid;
-     // }
-
-     /* Tables */
-     // table {
-     //   page-break-inside: auto;
-     // }
-     tr {
-       page-break-inside: avoid;
-       page-break-after: auto;
-     }
-
-       /* Main grid layout */
-       .print-profile {
-         display: grid !important;
-         grid-template-columns: 300px 1fr;
-         gap: 16px;
-         text-align: left !important;
-         padding: 12px !important;
-         height:300px;
-       }
-
-       /* Center image vertically */
-       .print-profile .relative {
-         display: flex;
-         align-items: center;
-         justify-content: center;
-       }
-
-       /* Image box smaller for print */
-       .print-profile .w-40 {
-         width: 400px !important;
-       }
-
-       .print-profile .h-48 {
-         height: 250px !important;
-       }
-
-       /* Name + contact align */
-       .print-profile h2,
-       .print-profile p {
-         margin-top: 0 !important;
-       }
-
-        .print-profile p {
-         position: relative;
-    top: -190px;
-       }
-       /* Move details next to name */
-       .print-profile>h2,
-       .print-profile>p,
-       .print-profile>div:not(.relative) {
-         grid-column: 2;
-       }
-
-       /* Inner info grid stays grid */
-       .print-profile .grid {
-         grid-template-columns: repeat(2, 1fr) !important;
-         gap: 12px;
-         position: relative;
-    top: -190px;
-       }
-
-       /* Remove visual noise */
-       .shadow-sm {
-         box-shadow: none !important;
-       }
-
-       /* Prevent page break */
-       .print-profile {
-         page-break-inside: avoid;
-       }
-    
-   </style>
- </head>
-
- <body>
-   ${content}
- </body>
-
- </html>
-  `);
-
-    win.document.close();
-    win.focus();
-    win.print();
-  }
-</script>
