@@ -253,16 +253,17 @@
               <tr class="hover:bg-gray-50">
                 <td class="p-4 font-bold text-gray-900"><%= row.exam || 'N/A' %></td>
                 <td class="p-4">
-                  <span class="font-medium"><%= row.board || 'N/A' %></span><br />
-                  <small class="text-gray-400"><%= row.institution || '' %></small>
+              <%= row.board || 'N/A' %>
+                
+                </td>
+                   <td class="p-4">
+             <%= row.institution || '' %>
                 </td>
                 <td class="p-4 text-center"><%= row.year || '—' %></td>
-                <td class="p-4 text-center">
-                  <% if(row.marksObtained || row.maxMarks) { %>
-                  <%= row.marksObtained || '0' %> / <%= row.maxMarks || '0' %>
-                  <% } else { %>
-                  <span class="text-gray-300">—</span>
-                  <% } %>
+                <td class="p-4 text-center"> <%= row.maxMarks || '0' %>              
+                </td>
+                 <td class="p-4 text-center">            
+                  <%= row.marksObtained || '0' %> 
                 </td>
                 <td class="p-4 text-right font-black text-blue-600">
                   <%= row.percentage %><%= (row.percentage && row.percentage > 10) ? '%' : '' %>
