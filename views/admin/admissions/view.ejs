@@ -315,7 +315,8 @@
         </div>
         <div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
           <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">Hostel Required</label>
-            <p class="text-xs font-bold uppercase"><%= admission.hostelRequired || 'No' %></p><% if(admission.hostelType) { %><p class="text-[9px] text-blue-500 font-bold"><%= admission.hostelType %></p><% } %>
+            <p class="text-xs font-bold uppercase"><%= admission.hostelRequired || 'No' %></p> (Hostel Type<% if(admission.hostelType) { %><p class="text-[9px] text-blue-500 font-bold"><%= admission.hostelType || 'N/A' %></p><% } %>
+            <p class="text-xs font-bold uppercase"> Food preference:<%= admission.hostelSpecialReq || 'N/A' %></p> 
           </div>
           <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">BPL Status</label>
             <p class="text-xs font-bold <%= admission.isBpl === 'Yes' ? 'text-red-600' : '' %>"><%= admission.isBpl %></p>
@@ -324,7 +325,7 @@
             <p class="text-xs font-bold <%= admission.isPwd === 'Yes' ? 'text-red-600' : '' %>"><%= admission.isPwd %></p>
           </div>
           <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">Chronic Illness</label>
-            <p class="text-xs font-bold"><%= admission.isChronic %></p>
+            <p class="text-xs font-bold"><%= admission.isChronic %></p> 
           </div>
           <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">Psychological</label>
             <p class="text-xs font-bold"><%= admission.isPsychology %></p>
