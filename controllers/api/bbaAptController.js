@@ -85,21 +85,17 @@ exports.updateBbaApplication = async (req, res) => {
 
 exports.updateApplicationFields = async (req, res) => {
   try {
-    const { type = "bba", id } = req.params; // id represents the studentId
+    const { type = "bba", id } = req.params; 
     const updateData = { ...req.body }; 
 
-    // 1. Extract isFormSubmitted from body if it exists
     const shouldUpdateSubmissionStatus = 'isFormSubmitted' in updateData;
     const isFormSubmittedValue = updateData.isFormSubmitted;
 
-    // 2. Clean updateData for the Application model
     const restrictedFields = ["id", "studentId", "createdAt", "applicationNo", "isFormSubmitted"];
     restrictedFields.forEach((field) => delete updateData[field]);
 
-    // 3. Select the correct model string for the transaction
     const appModelName = type.toLowerCase() === "mba" ? "mbaApplication" : "bbaApplication";
 
-    // 4. Find existing application to get its primary ID
     const existingRecord = await prisma[appModelName].findFirst({
       where: { studentId: parseInt(id) },
     });
@@ -108,15 +104,11 @@ exports.updateApplicationFields = async (req, res) => {
       return sendError(res, `${type.toUpperCase()} Application not found`, null, 404);
     }
 
-    // 5. Execute Updates
     const result = await prisma.$transaction(async (tx) => {
-      // Update the Application (BBA/MBA)
       const updatedApp = await tx[appModelName].update({
         where: { id: existingRecord.id },
         data: updateData,
       });
-
-      // Conditional Update: Only update Student table if isFormSubmitted was in the request
       if (shouldUpdateSubmissionStatus) {
         await tx.student.update({
           where: { id: parseInt(id) },
