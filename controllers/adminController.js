@@ -194,7 +194,7 @@ const showDashboard = asyncHandler(async (req, res) => {
 });
 const listAdmissions = asyncHandler(async (req, res) => {
   const page = parseInt(req.query.page) || 1;
-  const limit = parseInt(req.query.limit) || 20;
+  const limit = parseInt(req.query.limit) || 1000;
   const skip = (page - 1) * limit;
   const status = req.query.status;
   const search = req.query.search;
