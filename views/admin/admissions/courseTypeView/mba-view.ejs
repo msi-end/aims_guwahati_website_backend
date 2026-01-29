@@ -253,17 +253,17 @@
               <tr class="hover:bg-gray-50">
                 <td class="p-4 font-bold text-gray-900"><%= row.exam || 'N/A' %></td>
                 <td class="p-4">
-              <%= row.board || 'N/A' %>
-                
+                  <%= row.board || 'N/A' %>
+
                 </td>
-                   <td class="p-4">
-             <%= row.institution || '' %>
+                <td class="p-4">
+                  <%= row.institution || '' %>
                 </td>
                 <td class="p-4 text-center"><%= row.year || '—' %></td>
-                <td class="p-4 text-center"> <%= row.maxMarks || '0' %>              
+                <td class="p-4 text-center"> <%= row.maxMarks || '0' %>
                 </td>
-                 <td class="p-4 text-center">            
-                  <%= row.marksObtained || '0' %> 
+                <td class="p-4 text-center">
+                  <%= row.marksObtained || '0' %>
                 </td>
                 <td class="p-4 text-right font-black text-blue-600">
                   <%= row.percentage %><%= (row.percentage && row.percentage > 10) ? '%' : '' %>
@@ -296,20 +296,81 @@
             </div>
           </div>
 
-          <div>
-            <label class="text-[10px] font-black uppercase text-gray-400 block mb-2">Detailed Work Experience</label>
-            <% const workRows = safeParse(admission.workExperienceRows); %>
-            <% if(workRows.length > 0) { %>
-            <div class="space-y-2">
-              <% workRows.forEach(row => { %>
-              <div class="text-[11px] p-2 border-l-2 border-indigo-500 bg-gray-50 flex justify-between">
-                <span><b><%= row.organisation %></b> (<%= row.designation %>)</span>
-                <span class="text-gray-500"><%= row.fromDate %> to <%= row.toDate %></span>
-              </div>
-              <% }) %>
-            </div>
-            <% } else { %> <p class="text-xs text-gray-300 italic">No professional records found.</p> <% } %>
-          </div>
+          
+
+
+
+<div class="mt-6">
+  <label class="text-[10px] font-black uppercase text-gray-400 block mb-2">
+    Detailed Work Experience
+  </label>
+
+  <% 
+    // We use a unique variable name 'finalWorkData' to avoid conflicts
+    let finalWorkData = []; 
+    
+    try {
+      if (admission.workExperienceRows) {
+        // Handle if Prisma already parsed it as an object
+        if (typeof admission.workExperienceRows === 'object') {
+          finalWorkData = admission.workExperienceRows;
+        } 
+        // Handle if it's a JSON string
+        else if (typeof admission.workExperienceRows === 'string' && admission.workExperienceRows.trim() !== "") {
+          finalWorkData = JSON.parse(admission.workExperienceRows);
+        }
+      }
+    } catch (err) {
+      console.error("Work Experience Parse Error:", err);
+      finalWorkData = [];
+    }
+  %>
+
+  <% if (Array.isArray(finalWorkData) && finalWorkData.length > 0) { %>
+    <div class="border rounded-xl overflow-hidden shadow-sm">
+      <table class="w-full text-xs text-left">
+        <thead class="bg-gray-50 text-gray-400 uppercase font-black border-b">
+          <tr>
+            <th class="p-4">Company</th>
+            <th class="p-4">Role</th>
+            <th class="p-4 text-right">Duration</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y bg-white">
+          <% finalWorkData.forEach(function(row) { %>
+            <tr class="hover:bg-gray-50 transition-colors">
+              <td class="p-4 font-bold text-gray-900">
+                <%= row.company || row.organisation || 'N/A' %>
+              </td>
+              <td class="p-4 text-gray-700">
+                <%= row.role || row.designation || 'N/A' %>
+              </td>
+              <td class="p-4 text-right font-mono text-blue-600">
+                <%= row.duration || '—' %>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <div class="p-6 border border-dashed rounded-xl text-center bg-gray-50/50">
+      <p class="text-xs text-gray-400 font-medium italic">No professional work records found for this applicant.</p>
+    </div>
+  <% } %>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
           <% } %>
         </div>
       </div>
