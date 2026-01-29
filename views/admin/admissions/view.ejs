@@ -221,23 +221,68 @@
               <tr>
                 <th class="p-3">Examination</th>
                 <th class="p-3">Board/School</th>
+                <th class="p-3">Institution</th>
                 <th class="p-3 text-center">Year</th>
-                <th class="p-3 text-right">Percentage</th>
+                <th class="p-3">Total Marks</th>
+                <th class="p-3">Marks Obtain</th>
+                <th class="p-3 text-right">Percentage/CGPA</th>
               </tr>
             </thead>
             <tbody class="divide-y">
+              <% if (admission.academicRows) { %>
+              <% 
+      let rows = [];
+      try { 
+        rows = JSON.parse(admission.academicRows); 
+      } catch(e) { 
+        rows = []; 
+      }
+    %>
+              <% rows.forEach(function(row) { %>
               <tr>
-                <td class="p-3 font-bold">10th (Class X)</td>
-                <td class="p-3"><%= admission.c10Board %> | <%= admission.c10School %></td>
-                <td class="p-3 text-center"><%= admission.c10Year %></td>
-                <td class="p-3 text-right text-blue-600 font-black"><%= admission.c10Percentage %>%</td>
+                <td class="p-3 font-bold"><%= row.exam || 'N/A' %></td>
+                <td class="p-3"><%= row.board || 'N/A' %></td>
+                <td class="p-3"><%= row.institution || 'N/A' %></td>
+                <td class="p-3 text-center"><%= row.maxMarks || 'N/A' %></td>
+                <td class="p-3 text-center"><%= row.marksObtained || 'N/A' %></td>
+                <td class="p-3 text-center"><%= row.year || 'N/A' %></td>
+                <td class="p-3 text-right text-blue-600 font-black">
+                  <%= row.percentage %><%= row.percentage ? '%' : '' %>
+                </td>
+              </tr>
+              <% }); %>
+
+              <% } else { %>
+              <tr>
+                <td class="p-3 font-bold">Class 10 (HSLC)</td>
+                <td class="p-3"><%= admission.c10Board || 'N/A' %></td>
+                <td class="p-3"><%= admission.c10School || 'N/A' %></td>
+                <td class="p-3 text-center"><%= admission.c10MaxMarks || 'N/A' %></td>
+                <td class="p-3 text-center"><%= admission.c10MarksObt || 'N/A' %></td>
+                <td class="p-3 text-center"><%= admission.c10Year || 'N/A' %></td>
+                <td class="p-3 text-right text-blue-600 font-black">
+                  <%= admission.c10Percentage %><%= admission.c10Percentage ? '%' : '' %>
+                </td>
               </tr>
               <tr>
-                <td class="p-3 font-bold">12th (Class XII)</td>
-                <td class="p-3"><%= admission.c12Board %> | <%= admission.c12School %></td>
-                <td class="p-3 text-center"><%= admission.c12Year %></td>
-                <td class="p-3 text-right text-blue-600 font-black"><%= admission.c12Percentage %>%</td>
+                <td class="p-3 font-bold">Class 12 (HS)</td>
+                <td class="p-3"><%= admission.c12Board || 'N/A' %></td>
+                <td class="p-3"><%= admission.c12School || 'N/A' %></td>
+                <td class="p-3 text-center"><%= admission.c12MaxMarks || 'N/A' %></td>
+                <td class="p-3 text-center"><%= admission.c12MarksObt || 'N/A' %></td>
+                <td class="p-3 text-center"><%= admission.c12Year || 'N/A' %></td>
+                <td class="p-3 text-right text-blue-600 font-black">
+                  <%= admission.c12Percentage %><%= admission.c12Percentage ? '%' : '' %>
+                </td>
               </tr>
+              <% if (admission.otherQual) { %>
+              <tr>
+                <td class="p-3 font-bold">Other Qual.</td>
+                <td colspan="5" class="p-3 text-gray-600"><%= admission.otherQual %></td>
+                <td class="p-3"></td>
+              </tr>
+              <% } %>
+              <% } %>
             </tbody>
           </table>
 
@@ -316,7 +361,8 @@
         <div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
           <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">Hostel Required</label>
             <p class="text-xs font-bold uppercase"><%= admission.hostelRequired || 'No' %></p><% if(admission.hostelType) { %><p class="text-[9px] text-blue-500 font-bold"><%= admission.hostelType || 'N/A' %>( Hostel Type)</p><% } %>
-            <p class="text-xs font-bold uppercase"> Food preference:<p class="text-[9px] text-blue-500 font-bold"><%= admission.hostelSpecialReq || 'N/A' %></p> 
+            <p class="text-xs font-bold uppercase"> Food preference:
+            <p class="text-[9px] text-blue-500 font-bold"><%= admission.hostelSpecialReq || 'N/A' %></p>
           </div>
           <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">BPL Status</label>
             <p class="text-xs font-bold <%= admission.isBpl === 'Yes' ? 'text-red-600' : '' %>"><%= admission.isBpl %></p>
@@ -325,7 +371,7 @@
             <p class="text-xs font-bold <%= admission.isPwd === 'Yes' ? 'text-red-600' : '' %>"><%= admission.isPwd %></p>
           </div>
           <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">Chronic Illness</label>
-            <p class="text-xs font-bold"><%= admission.isChronic %></p> 
+            <p class="text-xs font-bold"><%= admission.isChronic %></p>
           </div>
           <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">Psychological</label>
             <p class="text-xs font-bold"><%= admission.isPsychology %></p>
