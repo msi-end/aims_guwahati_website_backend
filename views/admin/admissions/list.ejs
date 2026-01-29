@@ -6,7 +6,7 @@
 
 <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
   <div class="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-    
+
     <div class="flex flex-wrap items-center gap-4">
       <div class="flex items-center space-x-2">
         <label class="text-sm font-medium text-gray-700">Course:</label>
@@ -30,11 +30,25 @@
         </select>
       </div>
     </div>
-    
-    <div class="flex items-center space-x-2">
+
+    <!-- <div class="flex items-center space-x-2">
       <button onclick="exportToCSV()" class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center text-sm">
         <i class="fas fa-file-csv mr-2"></i>Export CSV
       </button>
+    </div> -->
+    <div class="relative inline-block text-left group">
+      <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition flex items-center text-sm">
+        <i class="fas fa-file-csv mr-2"></i> Export Data <i class="fas fa-chevron-down ml-2 text-[10px]"></i>
+      </button>
+
+      <div class="hidden group-hover:block absolute right-0 w-40 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden">
+        <button onclick="triggerExport('BBA')" class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition flex items-center">
+          <i class="fas fa-user-graduate mr-3 opacity-50"></i> BBA Applications
+        </button>
+        <button onclick="triggerExport('MBA')" class="w-full text-left px-4 py-3 text-sm text-gray-700 hover:bg-green-50 hover:text-green-700 transition border-t flex items-center">
+          <i class="fas fa-briefcase mr-3 opacity-50"></i> MBA Applications
+        </button>
+      </div>
     </div>
   </div>
 </div>
@@ -46,7 +60,7 @@
       <%= filters.courseType %> Applications (<%= total %>)
     </h3>
   </div>
-  
+
   <div class="p-6">
     <table id="admissionsTable" class="display w-full">
       <thead>
@@ -56,13 +70,14 @@
           <th>Contact Info</th>
           <th>Course</th>
           <th>Status</th>
+          <th>Form Submission</th>
           <th>Applied Date</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-200">
         <% admissions.forEach(admission => { %>
-          <% 
+        <% 
              // Handle name difference between BBA (fullName) and MBA (firstName + lastName)
              const displayName = admission.fullName || (admission.firstName + ' ' + (admission.lastName || ''));
              const displayEmail = admission.email || admission.student?.email || 'N/A';
@@ -100,6 +115,19 @@
               <%= s.charAt(0).toUpperCase() + s.slice(1) %>
             </span>
           </td>
+
+          <td>
+            <%
+    const raw = admission.student?.isFormSubmitted;
+    const isSubmitted = raw === true;
+  %>
+
+            <span class="px-3 py-1 text-xs font-bold rounded-full
+    <%= isSubmitted ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+              <%= isSubmitted ? 'Submitted' : 'Not Submitted' %>
+            </span>
+          </td>
+
           <td class="text-sm text-gray-500">
             <%= new Date(admission.createdAt).toLocaleDateString('en-IN') %>
           </td>
@@ -111,12 +139,12 @@
               <button onclick="confirmDelete(<%= admission.id %>, '<%= filters.courseType %>')" class="text-red-500 hover:text-red-700">
                 <i class="fas fa-trash"></i>
               </button>
-              
+
               <div class="relative group">
                 <button class="text-gray-400 w-8 hover:text-gray-600"><i class="fas fa-ellipsis-v"></i></button>
                 <div class="hidden group-hover:block absolute right-0 w-32 bg-white border rounded shadow-xl z-50">
-                   <button onclick="changeStatus(<%= admission.id %>, 'approved')" class="block w-full text-left px-3 py-2 text-xs hover:bg-green-50 text-green-700">Approve</button>
-                   <button onclick="changeStatus(<%= admission.id %>, 'rejected')" class="block w-full text-left px-3 py-2 text-xs hover:bg-red-50 text-red-700">Reject</button>
+                  <button onclick="changeStatus(<%= admission.id %>, 'approved')" class="block w-full text-left px-3 py-2 text-xs hover:bg-green-50 text-green-700">Approve</button>
+                  <button onclick="changeStatus(<%= admission.id %>, 'rejected')" class="block w-full text-left px-3 py-2 text-xs hover:bg-red-50 text-red-700">Reject</button>
                 </div>
               </div>
             </div>
@@ -140,24 +168,36 @@
 
   function changeStatus(id, newStatus) {
     const courseType = '<%= filters.courseType %>';
-    if(confirm(`Mark application as ${newStatus}?`)) {
+    if (confirm(`Mark application as ${newStatus}?`)) {
       fetch(`/admin/admissions/${courseType.toLowerCase()}/${id}/status`, {
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status: newStatus })
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          status: newStatus
+        })
       }).then(() => window.location.reload());
     }
   }
 
- function confirmDelete(id, type) {
-  const courseType = type.toLowerCase();
+  function confirmDelete(id, type) {
+    const courseType = type.toLowerCase();
 
-  if (confirm(`Permanently delete this ${type} application? This cannot be undone.`)) {
-    const form = document.createElement('form');
-    form.method = 'POST';
-        form.action = `/admin/admissions/${courseType}/${id}/delete`;
-    document.body.appendChild(form);
-    form.submit();
+    if (confirm(`Permanently delete this ${type} application? This cannot be undone.`)) {
+      const form = document.createElement('form');
+      form.method = 'POST';
+      form.action = `/admin/admissions/${courseType}/${id}/delete`;
+      document.body.appendChild(form);
+      form.submit();
+    }
   }
-}
+</script>
+<script>
+  function triggerExport(course) {
+    const status = document.getElementById('statusFilter').value;
+    let url = `/admin/admissions/export/csv?courseType=${course}`;
+    if (status) url += `&status=${status}`;
+    window.location.href = url;
+  }
 </script>

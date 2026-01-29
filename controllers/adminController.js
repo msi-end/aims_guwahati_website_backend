@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const { prisma } = require("../config/db");
 const { asyncHandler } = require("../middleware/errorHandler");
 const { deleteFile } = require("../middleware/upload");
+const { Parser } = require("json2csv");
 const path = require("path");
 const fs = require("fs");
 
@@ -231,12 +232,15 @@ const listAdmissions = asyncHandler(async (req, res) => {
           select: {
             applicationNo: true,
             email: true,
+            isFormSubmitted:true
           },
         },
       },
     }),
     model.count({ where }),
   ]);
+  console.log(admissions);
+  
   const totalPages = Math.ceil(total / limit);
   res.render("admin/admissions/list", {
     layout: "layouts/main",
@@ -276,7 +280,7 @@ const viewAdmission = asyncHandler(async (req, res) => {
   if (!admission) {
     req.flash("error", "Admission record not found.");
     return res.redirect(
-      `/admin/admissions?courseType=${courseType.toUpperCase()}`
+      `/admin/admissions?courseType=${courseType.toUpperCase()}`,
     );
   }
 
@@ -334,7 +338,7 @@ const editAdmissionForm = asyncHandler(async (req, res) => {
   if (!admission) {
     req.flash("error", "Admission record not found");
     return res.redirect(
-      `/admin/admissions?courseType=${courseType.toUpperCase()}`
+      `/admin/admissions?courseType=${courseType.toUpperCase()}`,
     );
   }
 
@@ -434,7 +438,7 @@ const deleteAdmission = asyncHandler(async (req, res) => {
   if (!admission) {
     req.flash("error", "Admission record not found");
     return res.redirect(
-      `/admin/admissions?courseType=${courseType.toUpperCase()}`
+      `/admin/admissions?courseType=${courseType.toUpperCase()}`,
     );
   }
   const fileFields = [
@@ -621,8 +625,8 @@ const updateGalleryOrder = asyncHandler(async (req, res) => {
       prisma.gallery.update({
         where: { id: parseInt(item.id) },
         data: { displayOrder: parseInt(item.order) },
-      })
-    )
+      }),
+    ),
   );
 
   res.json({ success: true });
@@ -739,10 +743,6 @@ const deleteFaculty = asyncHandler(async (req, res) => {
   req.flash("success", "Faculty member removed successfully");
   res.redirect("/admin/faculty");
 });
-
-
-
-
 
 const listNotifications = asyncHandler(async (req, res) => {
   const category = req.query.category;
@@ -862,7 +862,6 @@ const deleteNotification = asyncHandler(async (req, res) => {
   res.redirect("/admin/notifications");
 });
 
-
 // 1. List all placement records
 const listPlacements = asyncHandler(async (req, res) => {
   const placements = await prisma.placementRecord.findMany({
@@ -893,7 +892,14 @@ const createPlacement = asyncHandler(async (req, res) => {
     req.flash("error", "Student photo is required");
     return res.redirect("/admin/placements/create");
   }
-  const { studentName, companyName, designation, package, batchYear, isActive } = req.body;
+  const {
+    studentName,
+    companyName,
+    designation,
+    package,
+    batchYear,
+    isActive,
+  } = req.body;
   await prisma.placementRecord.create({
     data: {
       studentName,
@@ -901,7 +907,7 @@ const createPlacement = asyncHandler(async (req, res) => {
       designation,
       package,
       batchYear,
-      isActive: (isActive === "on" || isActive === true) ? "Yes" : "No",
+      isActive: isActive === "on" || isActive === true ? "Yes" : "No",
       photoUrl: `/uploads/placements/${req.file.filename}`,
     },
   });
@@ -938,14 +944,25 @@ const updatePlacement = asyncHandler(async (req, res) => {
     return res.redirect("/admin/placements");
   }
 
-  const { studentName, companyName, designation, package, batchYear, isActive } = req.body;
+  const {
+    studentName,
+    companyName,
+    designation,
+    package,
+    batchYear,
+    isActive,
+  } = req.body;
   const updateData = {
     studentName,
     companyName,
     designation,
     package,
     batchYear,
-    isActive: (isActive === "on" || isActive === "true" || isActive === true) ? "Yes" : "No",  };
+    isActive:
+      isActive === "on" || isActive === "true" || isActive === true
+        ? "Yes"
+        : "No",
+  };
 
   if (req.file) {
     // Delete old photo if a new one is uploaded
@@ -986,7 +1003,100 @@ const deletePlacement = asyncHandler(async (req, res) => {
   res.redirect("/admin/placements");
 });
 
+const exportAdmissionsCSV = asyncHandler(async (req, res) => {
+  try {
+    const { courseType, status } = req.query;
+    const where = status ? { status } : {};
 
+    let data = [];
+    if (courseType === "MBA") {
+      data = await prisma.mbaApplication.findMany({
+        where,
+        include: { student: true },
+        orderBy: { createdAt: "desc" },
+      });
+    } else {
+      data = await prisma.bbaApplication.findMany({
+        where,
+        include: { student: true },
+        orderBy: { createdAt: "desc" },
+      });
+    }
+
+    if (!data.length) return res.status(404).send("No data found");
+
+    // Flattening Logic
+    const flattenedData = data.map((item) => {
+      // Common Base Data
+      const base = {
+        "Application No": item.student?.applicationNo || "N/A",
+        Status: item.status,
+        "Applied Date": new Date(item.createdAt).toLocaleString("en-IN"),
+        "Payment Status": item.payStatusStudent,
+        "Full Name":
+          item.fullName ||
+          `${item.firstName} ${item.middleName || ""} ${item.lastName || ""}`
+            .replace(/\s+/g, " ")
+            .trim(),
+        Gender: item.gender,
+        DOB: item.dateOfBirth,
+        Email: item.email || item.student?.email,
+        Mobile: item.mobileNumber,
+        Category: item.category,
+        Aadhaar: item.aadhaarNumber,
+        Nationality: item.nationality,
+        "Blood Group": item.bloodGroup || "N/A",
+        "Father Name": item.fatherName,
+        "Mother Name": item.motherName,
+        Guardian: `${item.guardianName || ""} (${item.guardianRelation || ""})`,
+        "Hostel Required": item.hostelRequired,
+        "Hostel Type": item.hostelType || "N/A",
+        "10th Board": item.c10Board,
+        "10th %": item.c10Percentage,
+        "12th Board": item.c12Board,
+        "12th %": item.c12Percentage,
+        "Is BPL": item.isBpl,
+        "Is PWD": item.isPwd,
+        "Chronic Illness": item.isChronic,
+      };
+
+      // Course Specific Additions
+      if (courseType === "MBA") {
+        return {
+          ...base,
+          "PAN Number": item.panNumber,
+          "Perm Address": `${item.permAddressLine1}, ${item.permCity}, ${item.permDistrict}, ${item.permState} - ${item.permPinCode}`,
+          "Qualifying Exam": item.qualifyingExams,
+          "Exam Score": item.qualifyingExamScore,
+          Degree: item.degree,
+          Specialisation: item.specialisation,
+          "Work Experience": item.hasWorkExperience,
+          "Academic JSON": item.academicRows, // Including raw JSON as a fallback
+          "Work Exp JSON": item.workExperienceRows,
+        };
+      } else {
+        return {
+          ...base,
+          "Permanent Address": item.permanentAddress,
+          "Corr Address": `${item.corrAddressLine}, ${item.corrDistrict}, ${item.corrState} - ${item.corrPinCode}`,
+          "Father Income": item.fatherIncome,
+          "Mother Income": item.motherIncome,
+          "Passed 10+2": item.passed10Plus2,
+        };
+      }
+    });
+
+    const parser = new Parser();
+    const csv = parser.parse(flattenedData);
+
+    res.header("Content-Type", "text/csv");
+    res.attachment(`${courseType}_Data_${Date.now()}.csv`);
+    return res.send(csv);
+  } catch (error) {
+    console.error("Export Error:", error);
+    res.status(500).send("Export failed");
+  }
+});
 
 module.exports = {
   showLogin,
@@ -1030,4 +1140,6 @@ module.exports = {
   editPlacementForm,
   updatePlacement,
   deletePlacement,
+
+  exportAdmissionsCSV,
 };

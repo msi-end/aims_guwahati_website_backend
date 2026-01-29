@@ -15,6 +15,8 @@ router.get('/', isAuthenticated, (req, res) => res.redirect('/admin/admissions')
 router.get('/dashboard', isAuthenticated, adminController.showDashboard);
 
 // Admissions Management
+router.get('/admissions/export/csv', adminController.exportAdmissionsCSV);
+
 router.get('/admissions', isAuthenticated, adminController.listAdmissions);
 router.get('/admissions/:courseType/:id', isAuthenticated, adminController.viewAdmission);
 router.get('/admissions/:courseType/:id/edit', isAuthenticated, adminController.editAdmissionForm);
@@ -59,5 +61,7 @@ router.post("/placements/create", uploadPlacementRecordsMiddleware, adminControl
 router.get("/placements/edit/:id", adminController.editPlacementForm);
 router.post("/placements/edit/:id", uploadPlacementRecordsMiddleware, adminController.updatePlacement);
 router.post("/placements/delete/:id", adminController.deletePlacement);
+
+
     
 module.exports = router;
