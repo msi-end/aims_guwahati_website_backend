@@ -203,7 +203,7 @@
             <span class="text-[9px] font-black text-gray-400 uppercase block border-b mb-2"><%= p.role %> Details</span>
             <p class="text-sm font-bold">Name: <%= p.name || 'N/A' %></p>
             <p class="text-xs text-gray-600 italic">Occupation:<%= p.occ || 'Occupation N/A' %></p>
-            <% if(p.inc && !p.inc.includes('Address')) { %> <p class="text-[10px] font-bold"><%= p.inc %></p> <% } %>
+            <% if(p.inc && !p.inc.includes('Address')) { %> <p class="text-[10px] font-bold">Address:<%= p.inc %></p> <% } %>
             <p class="text-xs font-mono text-blue-600">Contact:<%= p.mob || 'No Contact' %></p>
           </div>
           <% }) %>
