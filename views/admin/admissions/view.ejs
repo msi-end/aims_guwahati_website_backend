@@ -228,62 +228,73 @@
                 <th class="p-3 text-right">Percentage/CGPA</th>
               </tr>
             </thead>
-            <tbody class="divide-y">
-              <% if (isMba) { %>
-              <% 
-      let rows = [];
-      try { 
-        rows = JSON.parse(admission.academicRows); 
-      } catch(e) { 
-        rows = []; 
-      }
-    %>
-              <% rows.forEach(function(row) { %>
-              <tr>
-                <td class="p-3 font-bold"><%= row.exam || 'N/A' %></td>
-                <td class="p-3"><%= row.board || 'N/A' %></td>
-                <td class="p-3"><%= row.institution || 'N/A' %></td>
-                <td class="p-3 text-center"><%= row.maxMarks || 'N/A' %></td>
-                <td class="p-3 text-center"><%= row.marksObtained || 'N/A' %></td>
-                <td class="p-3 text-center"><%= row.year || 'N/A' %></td>
-                <td class="p-3 text-right text-blue-600 font-black">
-                  <%= row.percentage %><%= row.percentage ? '%' : '' %>
-                </td>
-              </tr>
-              <% }); %>
+        <tbody class="divide-y">
 
-              <% } else { %>
-              <tr>
-                <td class="p-3 font-bold">Class 10 (HSLC)</td>
-                <td class="p-3"><%= admission.c10Board || 'N/A' %></td>
-                <td class="p-3"><%= admission.c10School || 'N/A' %></td>
-                <td class="p-3 text-center"><%= admission.c10MaxMarks || 'N/A' %></td>
-                <td class="p-3 text-center"><%= admission.c10MarksObt || 'N/A' %></td>
-                <td class="p-3 text-center"><%= admission.c10Year || 'N/A' %></td>
-                <td class="p-3 text-right text-blue-600 font-black">
-                  <%= admission.c10Percentage %><%= admission.c10Percentage ? '%' : '' %>
-                </td>
-              </tr>
-              <tr>
-                <td class="p-3 font-bold">Class 12 (HS)</td>
-                <td class="p-3"><%= admission.c12Board || 'N/A' %></td>
-                <td class="p-3"><%= admission.c12School || 'N/A' %></td>
-                <td class="p-3 text-center"><%= admission.c12MaxMarks || 'N/A' %></td>
-                <td class="p-3 text-center"><%= admission.c12MarksObt || 'N/A' %></td>
-                <td class="p-3 text-center"><%= admission.c12Year || 'N/A' %></td>
-                <td class="p-3 text-right text-blue-600 font-black">
-                  <%= admission.c12Percentage %><%= admission.c12Percentage ? '%' : '' %>
-                </td>
-              </tr>
-              <% if (admission.otherQual) { %>
-              <tr>
-                <td class="p-3 font-bold">Other Qual.</td>
-                <td colspan="5" class="p-3 text-gray-600"><%= admission.otherQual %></td>
-                <td class="p-3"></td>
-              </tr>
-              <% } %>
-              <% } %>
-            </tbody>
+  <% 
+    // Detect MBA vs BBA
+    const isMBA = !!admission.academicRows;
+
+    // Parse MBA academic rows safely
+    let mbaAcademics = [];
+    if (isMBA) {
+      try {
+        mbaAcademics = JSON.parse(admission.academicRows || '[]');
+      } catch (e) {
+        mbaAcademics = [];
+      }
+    }
+  %>
+
+  <% if (isMBA) { %>
+
+    <% mbaAcademics.forEach(row => { %>
+      <tr>
+        <td class="p-3 font-bold"><%= row.exam || 'N/A' %></td>
+        <td class="p-3"><%= row.board || 'N/A' %></td>
+        <td class="p-3"><%= row.institution || 'N/A' %></td>
+        <td class="p-3 text-center"><%= row.year || 'N/A' %></td>
+        <td class="p-3 text-right text-blue-600 font-black">
+          <%= row.percentage ? row.percentage + '%' : 'N/A' %>
+        </td>
+      </tr>
+    <% }) %>
+
+  <% } else { %>
+
+    <!-- Class 10 -->
+    <tr>
+      <td class="p-3 font-bold">Class 10 (X)</td>
+      <td class="p-3"><%= admission.c10Board || 'N/A' %></td>
+      <td class="p-3"><%= admission.c10School || 'N/A' %></td>
+      <td class="p-3 text-center"><%= admission.c10Year || 'N/A' %></td>
+      <td class="p-3 text-right text-blue-600 font-black">
+        <%= admission.c10Percentage ? admission.c10Percentage + '%' : 'N/A' %>
+      </td>
+    </tr>
+
+    <!-- Class 12 -->
+    <tr>
+      <td class="p-3 font-bold">Class 12 (XII)</td>
+      <td class="p-3"><%= admission.c12Board || 'N/A' %></td>
+      <td class="p-3"><%= admission.c12School || 'N/A' %></td>
+      <td class="p-3 text-center"><%= admission.c12Year || 'N/A' %></td>
+      <td class="p-3 text-right text-blue-600 font-black">
+        <%= admission.c12Percentage ? admission.c12Percentage + '%' : 'N/A' %>
+      </td>
+    </tr>
+
+    <!-- Other Qualification (if exists) -->
+    <% if (admission.otherQual) { %>
+      <tr>
+        <td class="p-3 font-bold">Other Qualification</td>
+        <td class="p-3" colspan="4"><%= admission.otherQual %></td>
+      </tr>
+    <% } %>
+
+  <% } %>
+
+</tbody>
+
           </table>
 
           <% if(isMba) { %>
