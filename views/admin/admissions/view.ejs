@@ -201,10 +201,10 @@
           <% parents.forEach(p => { %>
           <div class="bg-gray-50 p-4 rounded-xl space-y-1">
             <span class="text-[9px] font-black text-gray-400 uppercase block border-b mb-2"><%= p.role %> Details</span>
-            <p class="text-sm font-bold"><%= p.name || 'N/A' %></p>
-            <p class="text-xs text-gray-600 italic"><%= p.occ || 'Occupation N/A' %></p>
-            <% if(p.inc && !p.inc.includes('Address')) { %> <p class="text-[10px] font-bold">Income: ₹<%= p.inc %></p> <% } %>
-            <p class="text-xs font-mono text-blue-600"><%= p.mob || 'No Contact' %></p>
+            <p class="text-sm font-bold">Name: <%= p.name || 'N/A' %></p>
+            <p class="text-xs text-gray-600 italic">Occupation:<%= p.occ || 'Occupation N/A' %></p>
+            <% if(p.inc && !p.inc.includes('Address')) { %> <p class="text-[10px] font-bold"><%= p.inc %></p> <% } %>
+            <p class="text-xs font-mono text-blue-600">Contact:<%= p.mob || 'No Contact' %></p>
           </div>
           <% }) %>
         </div>
@@ -315,8 +315,8 @@
         </div>
         <div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
           <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">Hostel Required</label>
-            <p class="text-xs font-bold uppercase"><%= admission.hostelRequired || 'No' %></p> (Hostel Type<% if(admission.hostelType) { %><p class="text-[9px] text-blue-500 font-bold"><%= admission.hostelType || 'N/A' %></p><% } %>
-            <p class="text-xs font-bold uppercase"> Food preference:<%= admission.hostelSpecialReq || 'N/A' %></p> 
+            <p class="text-xs font-bold uppercase"><%= admission.hostelRequired || 'No' %></p><% if(admission.hostelType) { %><p class="text-[9px] text-blue-500 font-bold"><%= admission.hostelType || 'N/A' %>( Hostel Type)</p><% } %>
+            <p class="text-xs font-bold uppercase"> Food preference:<p class="text-[9px] text-blue-500 font-bold"><%= admission.hostelSpecialReq || 'N/A' %></p> 
           </div>
           <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">BPL Status</label>
             <p class="text-xs font-bold <%= admission.isBpl === 'Yes' ? 'text-red-600' : '' %>"><%= admission.isBpl %></p>
