@@ -13,7 +13,7 @@ exports.createBbaApplication = async (req, res) => {
         res,
         "You have already submitted an application.",
         null,
-        400
+        400,
       );
     }
 
@@ -45,7 +45,7 @@ exports.createBbaApplication = async (req, res) => {
       res,
       "BBA Application submitted successfully",
       result,
-      201
+      201,
     );
   } catch (error) {
     console.error(error);
@@ -85,54 +85,56 @@ exports.updateBbaApplication = async (req, res) => {
 
 exports.updateApplicationFields = async (req, res) => {
   try {
-    const { type = "bba", id } = req.params; // type: 'bba' or 'mba', id: application ID
-    const updateData = req.body; // Only the fields the user wants to change
+    const { type = "bba", id } = req.params; // id represents the studentId
+    const updateData = { ...req.body }; 
 
-    // 1. Prevent updating sensitive relational IDs via this route
-    const restrictedFields = ["id", "studentId", "createdAt", "applicationNo"];
+    // 1. Extract isFormSubmitted from body if it exists
+    const shouldUpdateSubmissionStatus = 'isFormSubmitted' in updateData;
+    const isFormSubmittedValue = updateData.isFormSubmitted;
+
+    // 2. Clean updateData for the Application model
+    const restrictedFields = ["id", "studentId", "createdAt", "applicationNo", "isFormSubmitted"];
     restrictedFields.forEach((field) => delete updateData[field]);
 
-    // 2. Select the correct model
-    const model =
-      type.toLowerCase() === "bba"
-        ? prisma.bbaApplication
-        : prisma.mbaApplication;
+    // 3. Select the correct model string for the transaction
+    const appModelName = type.toLowerCase() === "mba" ? "mbaApplication" : "bbaApplication";
 
-    // 3. Check if record exists
-    const existingRecord = await model.findFirst({
+    // 4. Find existing application to get its primary ID
+    const existingRecord = await prisma[appModelName].findFirst({
       where: { studentId: parseInt(id) },
     });
 
     if (!existingRecord) {
-      return sendError(
-        res,
-        `${type.toUpperCase()} Application not found`,
-        null,
-        404
-      );
+      return sendError(res, `${type.toUpperCase()} Application not found`, null, 404);
     }
-    // (Skip this check if the user is an Admin)
-    // if (req.user.role !== "admin" && existingRecord.studentId !== req.user.id) {
-    //   return sendError(
-    //     res,
-    //     "You do not have permission to update this record",
-    //     null,
-    //     403
-    //   );
-    // }
 
-    const updatedRecord = await model.update({
-      where: { id: existingRecord.id },
-      data: updateData,
+    // 5. Execute Updates
+    const result = await prisma.$transaction(async (tx) => {
+      // Update the Application (BBA/MBA)
+      const updatedApp = await tx[appModelName].update({
+        where: { id: existingRecord.id },
+        data: updateData,
+      });
+
+      // Conditional Update: Only update Student table if isFormSubmitted was in the request
+      if (shouldUpdateSubmissionStatus) {
+        await tx.student.update({
+          where: { id: parseInt(id) },
+          data: { isFormSubmitted: isFormSubmittedValue === true || isFormSubmittedValue === "true" }
+        });
+      }
+
+      return updatedApp;
     });
 
     return sendSuccess(
-      res,
-      `${type.toUpperCase()} application updated successfully`,
-      updatedRecord
+      res, 
+      `${type.toUpperCase()} application updated successfully`, 
+      result
     );
+
   } catch (error) {
     console.error("Update Error:", error);
-    return sendError(res, "Failed to update fields: ");
+    return sendError(res, "Failed to update fields: " + error.message);
   }
 };

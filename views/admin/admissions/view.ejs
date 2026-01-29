@@ -1,505 +1,360 @@
-<% const isMba=!!admission.firstName; const displayName=isMba ? [admission.firstName, admission.middleName,
-  admission.lastName].filter(Boolean).join(' ') 
-: (admission.fullName || ' N/A'); %>
+<% 
+  // 1. Determine Type
+  const isMba = !!admission.firstName; 
+  
+  // 2. Helper: Name Logic
+  const displayName = isMba 
+    ? [admission.firstName, admission.middleName, admission.lastName].filter(Boolean).join(' ') 
+    : (admission.fullName || 'N/A'); 
+
+  // 3. Helper: JSON Parser for MBA Arrays
+  const safeParse = (str) => {
+    try { return (str && typeof str === 'string') ? JSON.parse(str) : []; } 
+    catch(e) { return []; }
+  };
+%>
 
 
+<style>
+  .font-bold {
+    font-weight: 900;
+  }
 
-  <!-- Add custom PDF script -->
-  <!-- <script src="/js/admission-pdf.js"></script> -->
+  .text-\[9px\] {
+    font-size: 10px;
+  }
+</style>
 
+<div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-gray-50 min-h-screen" id="printArea">
 
-
-  <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-gray-50 min-h-screen" id="printArea">
-    <div
-      class="flex flex-col md:flex-row md:items-center justify-between mb-8 border-b bg-white p-6 rounded-2xl shadow-sm">
-      <div>
-        <nav class="flex mb-2">
-          <a href="/admin/admissions?courseType=<%= isMba ? 'MBA' : 'BBA' %>"
-            class="text-sm text-blue-600 font-bold hover:underline">
-            <i class="fas fa-arrow-left mr-1"></i> Back to Admissions List
-          </a>
-        </nav>
-        <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tight">
-          <%= isMba ? 'MBA' : 'BBA' %> Application
-        </h1>
-        <div class="flex items-center mt-2 space-x-4">
-          <span class="text-gray-500 font-mono text-sm">ID: #<%= admission.id %></span>
-          <span class="text-gray-500 font-mono text-sm">App No: <%= admission.student?.applicationNo || 'N/A' %></span>
-        </div>
-      </div>
-
-      <div class="mt-4 md:mt-0 flex flex-col items-end space-y-3">
-        <div class="flex space-x-2">
-          <span
-            class="px-4 py-2 rounded-lg text-xs font-black uppercase border <%= admission.status === 'approved' ? 'bg-green-100 text-green-700 border-green-200' : 'bg-yellow-100 text-yellow-700 border-yellow-200' %>">
-            Admission: <%= admission.status %>
-          </span>
-          <span
-            class="px-4 py-2 rounded-lg text-xs font-black uppercase border bg-blue-100 text-blue-700 border-blue-200">
-            Exam: <%= admission.entranceExamStatus %>
-          </span>
-        </div>
-        <p class="text-[10px] text-gray-400 font-bold uppercase">Applied on: <%=
-            admission.createdAt.toLocaleDateString() %>
-        </p>
+  <div class="flex flex-col md:flex-row justify-between mb-8 border-b bg-white p-6 rounded-2xl shadow-sm">
+    <div class="space-y-1">
+      <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tighter">
+        <%= isMba ? 'MBA' : 'BBA' %> FULL APPLICATION RECORD
+      </h1>
+      <div class="flex gap-4 text-xs font-mono text-gray-500 uppercase">
+        <span>App No: <b class="text-gray-900"><%= admission.student?.applicationNo || 'N/A' %></b></span>
+        <span>Internal ID: #<%= admission.id %></span>
+        <span>Applied: <%= admission.createdAt.toLocaleDateString('en-IN') %></span>
       </div>
     </div>
-
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-
-      <div class="lg:col-span-1 space-y-6">
-        <div class="bg-white rounded-2xl shadow-sm border p-6 text-center print-profile">
-
-          <div class="relative inline-block">
-            <% if (admission.photoUrl) { %>
-              <img src="/<%= admission.photoUrl %>"
-                class="w-40 h-48 mx-auto object-cover rounded-xl shadow-md border-4 border-white">
-              <% } else { %>
-                <div
-                  class="w-40 h-48 mx-auto bg-gray-100 rounded-xl flex items-center justify-center border-2 border-dashed">
-                  <i class="fas fa-user text-4xl text-gray-300"></i>
-                </div>
-                <% } %>
-          </div>
-
-          <h2 class="mt-4 text-xl font-bold text-gray-900">
-            <%= displayName %>
-          </h2>
-          <p class="text-blue-600 text-sm font-medium">
-            <%= admission.email || 'N/A' %>
-          </p>
-          <p class="text-gray-500 text-sm">
-            <%= admission.mobileNumber || 'N/A' %>
-          </p>
-
-          <div class="mt-6 pt-6 border-t grid grid-cols-2 gap-4 text-left">
-            <div>
-              <label class="block text-[10px] font-black text-gray-400 uppercase">Blood Group</label>
-              <span class="text-sm font-bold">
-                <%= admission.bloodGroup || 'N/A' %>
-              </span>
-            </div>
-            <div>
-              <label class="block text-[10px] font-black text-gray-400 uppercase">Nationality</label>
-              <span class="text-sm font-bold">
-                <%= admission.nationality || 'N/A' %>
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <div class="bg-white rounded-2xl shadow-sm border p-6">
-          <h3 class="font-bold text-gray-900 mb-4 flex items-center">
-            <i class="fas fa-edit mr-2 text-blue-500"></i> Update Status
-          </h3>
-          <form action="/admin/admissions/<%= isMba ? 'mba' : 'bba' %>/<%= admission.id %>/status" method="POST"
-            class="space-y-4">
-            <div>
-              <label class="text-[10px] font-bold text-gray-400 uppercase">Admission Status</label>
-              <select name="status" class="w-full mt-1 p-2 border rounded-lg bg-gray-50 text-sm">
-                <option value="pending" <%=admission.status==='pending' ? 'selected' : '' %>>Pending</option>
-                <option value="approved" <%=admission.status==='approved' ? 'selected' : '' %>>Approved</option>
-                <option value="rejected" <%=admission.status==='rejected' ? 'selected' : '' %>>Rejected</option>
-              </select>
-            </div>
-            <!-- <div>
-                        <label class="text-[10px] font-bold text-gray-400 uppercase">Entrance Exam Status</label>
-                        <select name="entranceExamStatus" class="w-full mt-1 p-2 border rounded-lg bg-gray-50 text-sm">
-                            <option value="Pending" <%= admission.entranceExamStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
-                            <option value="Qualified" <%= admission.entranceExamStatus === 'Qualified' ? 'selected' : '' %>>Qualified</option>
-                            <option value="Not Qualified" <%= admission.entranceExamStatus === 'Not Qualified' ? 'selected' : '' %>>Not Qualified</option>
-                        </select>
-                    </div> -->
-            <button type="submit"
-              class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold  hover:bg-blue-700 transition shadow-lg shadow-blue-100">
-              Save Changes
-            </button>
-          </form>
-          <br>
-          <button onclick="printPDF()"
-            class="w-full bg-blue-600 text-white py-2 px-2 rounded-lg flex gap-1  font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-100"
-            style="text-align: center;
-    justify-content: center;">
-            <svg fill="white" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
-              xmlns:xlink="http://www.w3.org/1999/xlink" width="26px" height="26px" viewBox="0 0 584.332 584.332"
-              xml:space="preserve">
-              <g>
-                <g>
-                  <path d="M530.33,42.289H54.003C24.176,42.289,0,66.464,0,96.29v192.751c0,29.827,24.176,54.003,54.003,54.003h102.532
-			L138.39,481.137c-2.026,15.38,2.683,30.893,12.907,42.552c10.214,11.659,24.984,18.354,40.506,18.354h200.738
-			c15.521,0,30.291-6.695,40.496-18.346c10.234-11.669,14.941-27.181,12.926-42.562l-18.166-138.094h102.531
-			c29.828,0,54.004-24.176,54.004-54.003V96.288C584.334,66.464,560.158,42.289,530.33,42.289z M70.606,144.374
-			c-17.481,0-31.651-14.169-31.651-31.65s14.17-31.653,31.651-31.653c17.48,0,31.65,14.17,31.65,31.653
-			C102.259,130.205,88.089,144.374,70.606,144.374z M403.754,498.008c-2.832,3.233-6.914,5.077-11.213,5.077H191.803
-			c-4.298,0-8.378-1.844-11.222-5.088c-2.825-3.225-4.127-7.523-3.568-11.782l25.459-193.691h179.399l25.471,193.69
-			C407.893,490.474,406.588,494.773,403.754,498.008z M454.723,277.599c0,20.82-11.907,38.767-29.264,47.659l-9.408-71.547
-			c-0.057-0.428-0.219-0.828-0.285-1.256v-38.421c0-8.228-6.694-14.923-14.922-14.923H183.469c-8.225,0-14.922,6.695-14.922,14.923
-			v38.507c-0.057,0.4-0.208,0.761-0.268,1.171l-9.406,71.558c-17.356-8.892-29.282-26.839-29.282-47.669v-63.566
-			c0-29.71,24.166-53.878,53.878-53.878h217.375c29.711,0,53.879,24.166,53.879,53.878V277.599L454.723,277.599z" />
-                </g>
-              </g>
-            </svg>
-            Print
-          </button>
-        </div>
-      </div>
-
-      <div class="lg:col-span-3 space-y-8">
-
-        <section class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-          <div class="px-6 py-4 bg-gray-50 border-b flex justify-between items-center">
-            <h3 class="font-bold text-gray-800 uppercase text-sm tracking-wider">Personal Information</h3>
-            <span class="text-[13px] font-bold bg-blue-100 text-blue-700 px-2 py-1 rounded">DOB: <%=
-                admission.dateOfBirth %></span>
-          </div>
-          <div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div>
-              <label class="text-[10px] font-black text-gray-400 uppercase">Gender</label>
-              <p class="text-sm font-semibold text-gray-800">
-                <%= admission.gender || 'N/A' %>
-              </p>
-            </div>
-            <div>
-              <label class="text-[10px] font-black text-gray-400 uppercase">Category</label>
-              <p class="text-sm font-semibold text-gray-800">
-                <%= admission.category || 'N/A' %>
-              </p>
-            </div>
-            <div>
-              <label class="text-[10px] font-black text-gray-400 uppercase">Aadhaar No</label>
-              <p class="text-sm font-semibold text-gray-800">
-                <%= admission.aadhaarNumber || 'N/A' %>
-              </p>
-            </div>
-            <% if(isMba) { %>
-              <div>
-                <label class="text-[10px] font-black text-gray-400 uppercase">PAN No</label>
-                <p class="text-sm font-semibold text-gray-800">
-                  <%= admission.panNumber || 'N/A' %>
-                </p>
-              </div>
-              <% } %>
-          </div>
-        </section>
-
-        <section class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-          <div class="px-6 py-4 bg-gray-50 border-b flex justify-between items-center">
-            <h3 class="font-bold text-gray-800 uppercase text-sm tracking-wider">Address Details</h3>
-            <div class="flex space-x-2">
-              <span class="text-[12px] font-bold bg-purple-100 text-purple-700 px-2 py-1 rounded">Hostel: <%=
-                  admission.hostelRequired %></span>
-              <% if(admission.hostelType) { %><span
-                  class="text-[12px] font-bold bg-purple-50 text-purple-600 px-2 py-1 rounded">
-                  <%= admission.hostelType %>
-                </span>
-                <% } %>
-            </div>
-          </div>
-          <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-8 section-break">
-            <div class="space-y-4">
-              <h4 class="text-[11px] font-black text-blue-600 uppercase tracking-widest border-b pb-1">Permanent Address
-              </h4>
-              <div class="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-dashed">
-                <% if(isMba) { %>
-                  <div class="col-span-2">
-                    <label class="text-[9px] font-bold text-gray-400 uppercase block">Address Line</label>
-                    <span class="text-sm font-medium">
-                      <%= admission.permAddressLine1 %>
-                    </span>
-                  </div>
-                  <div>
-                    <label class="text-[9px] font-bold text-gray-400 uppercase block">City</label>
-                    <span class="text-sm font-medium">
-                      <%= admission.permCity %>
-                    </span>
-                  </div>
-                  <div>
-                    <label class="text-[9px] font-bold text-gray-400 uppercase block">District</label>
-                    <span class="text-sm font-medium">
-                      <%= admission.permDistrict %>
-                    </span>
-                  </div>
-                  <div>
-                    <label class="text-[9px] font-bold text-gray-400 uppercase block">State</label>
-                    <span class="text-sm font-medium">
-                      <%= admission.permState %>
-                    </span>
-                  </div>
-                  <div>
-                    <label class="text-[9px] font-bold text-gray-400 uppercase block">PIN Code</label>
-                    <span class="text-sm font-mono font-bold">
-                      <%= admission.permPinCode %>
-                    </span>
-                  </div>
-                  <% } else { %>
-                    <div class="col-span-2">
-                      <label class="text-[9px] font-bold text-gray-400 uppercase block">Full Address</label>
-                      <span class="text-sm font-medium">
-                        <%= admission.permanentAddress || 'N/A' %>
-                      </span>
-                    </div>
-                    <% } %>
-              </div>
-            </div>
-
-            <div class="space-y-4">
-              <h4 class="text-[11px] font-black text-blue-600 uppercase tracking-widest border-b pb-1">Correspondence
-                Address</h4>
-              <div class="grid grid-cols-2 gap-4 bg-gray-50 p-4 rounded-xl border border-dashed">
-                <div class="col-span-2">
-                  <label class="text-[9px] font-bold text-gray-400 uppercase block">Address Line</label>
-                  <span class="text-sm font-medium">
-                    <%= admission.corrAddressLine || admission.corrAddressLine1 %>
-                  </span>
-                </div>
-                <div>
-                  <label class="text-[9px] font-bold text-gray-400 uppercase block">City</label>
-                  <span class="text-sm font-medium">
-                    <%= admission.corrCity %>
-                  </span>
-                </div>
-                <div>
-                  <label class="text-[9px] font-bold text-gray-400 uppercase block">District</label>
-                  <span class="text-sm font-medium">
-                    <%= admission.corrDistrict %>
-                  </span>
-                </div>
-                <div>
-                  <label class="text-[9px] font-bold text-gray-400 uppercase block">State</label>
-                  <span class="text-sm font-medium">
-                    <%= admission.corrState %>
-                  </span>
-                </div>
-                <div>
-                  <label class="text-[9px] font-bold text-gray-400 uppercase block">PIN Code</label>
-                  <span class="text-sm font-mono font-bold">
-                    <%= admission.corrPinCode %>
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-          <div class="px-6 py-4 bg-gray-50 border-b">
-            <h3 class="font-bold text-gray-800 uppercase text-sm tracking-wider">Family Information</h3>
-          </div>
-          <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div class="border-r pr-4">
-              <label class="text-[10px] font-black text-gray-400 uppercase">Father's Details</label>
-              <p class="text-sm font-bold mt-1">
-                <%= admission.fatherName || 'N/A' %>
-              </p>
-              <p class="text-xs text-gray-500 italic">
-                <%= admission.fatherOccupation %> | ₹<%= admission.fatherIncome || '0' %>
-              </p>
-              <p class="text-xs font-mono text-blue-600 mt-1">
-                <%= admission.fatherMobile %>
-              </p>
-            </div>
-            <div class="border-r pr-4">
-              <label class="text-[10px] font-black text-gray-400 uppercase">Mother's Details</label>
-              <p class="text-sm font-bold mt-1">
-                <%= admission.motherName || 'N/A' %>
-              </p>
-              <p class="text-xs text-gray-500 italic">
-                <%= admission.motherOccupation %> | ₹<%= admission.motherIncome || '0' %>
-              </p>
-              <p class="text-xs font-mono text-blue-600 mt-1">
-                <%= admission.motherMobile %>
-              </p>
-            </div>
-            <div>
-              <label class="text-[10px] font-black text-gray-400 uppercase">Guardian Details</label>
-              <p class="text-sm font-bold mt-1">
-                <%= admission.guardianName || 'N/A' %> (<%= admission.guardianRelation %>)
-              </p>
-              <p class="text-xs text-gray-500">
-                <%= admission.guardianAddress %>
-              </p>
-              <p class="text-xs font-mono text-blue-600 mt-1">
-                <%= admission.guardianMobile %>
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-          <div class="px-6 py-4 bg-gray-800 text-white flex justify-between items-center">
-            <h3 class="font-bold uppercase text-sm">Academic Qualifications</h3>
-            <% if(isMba) { %><span class="text-xs bg-gray-700 px-2 py-1 rounded">CGPA: <%= admission.cgpa %></span>
-              <% } %>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm">
-              <thead class="bg-gray-50 border-b text-[10px] font-black text-gray-400 uppercase">
-                <tr>
-                  <th class="px-6 py-3">Examination</th>
-                  <th class="px-6 py-3">Board/School</th>
-                  <th class="px-6 py-3">Year</th>
-                  <th class="px-6 py-3">Marks</th>
-                  <th class="px-6 py-3 text-right">Percentage</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y">
-                <tr>
-                  <td class="px-6 py-4 font-bold">Class 10th</td>
-                  <td class="px-6 py-4">
-                    <%= admission.c10Board %> / <%= admission.c10School %>
-                  </td>
-                  <td class="px-6 py-4">
-                    <%= admission.c10Year %>
-                  </td>
-                  <td class="px-6 py-4">
-                    <%= admission.c10MarksObt %> / <%= admission.c10MaxMarks %>
-                  </td>
-                  <td class="px-6 py-4 text-right font-black text-blue-600">
-                    <%= admission.c10Percentage %>%
-                  </td>
-                </tr>
-                <tr>
-                  <td class="px-6 py-4 font-bold">Class 12th</td>
-                  <td class="px-6 py-4">
-                    <%= admission.c12Board %> / <%= admission.c12School %>
-                  </td>
-                  <td class="px-6 py-4">
-                    <%= admission.c12Year %>
-                  </td>
-                  <td class="px-6 py-4">
-                    <%= admission.c12MarksObt %> / <%= admission.c12MaxMarks %>
-                  </td>
-                  <td class="px-6 py-4 text-right font-black text-blue-600">
-                    <%= admission.c12Percentage %>%
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <% if(isMba && admission.academicRows && Array.isArray(admission.academicRows)) { %>
-            <div class="p-4 bg-indigo-50/30 border-t">
-              <label class="text-[10px] font-black text-indigo-400 uppercase block mb-2">Graduation & Advanced
-                Records</label>
-              <div class="space-y-3">
-                <% admission.academicRows.forEach((row, index)=> { %>
-                  <div class="bg-white p-3 rounded-lg border border-indigo-100 flex flex-wrap gap-4 text-xs">
-                    <div class="flex-1">
-                      <span class="text-[9px] text-gray-400 block uppercase font-bold">Exam/Degree</span>
-                      <span class="font-bold text-indigo-900">
-                        <%= row.examination || 'N/A' %>
-                      </span>
-                    </div>
-                    <div class="flex-1">
-                      <span class="text-[9px] text-gray-400 block uppercase font-bold">University/Board</span>
-                      <span class="font-medium text-gray-700">
-                        <%= row.board || row.university || 'N/A' %>
-                      </span>
-                    </div>
-                    <div class="w-20">
-                      <span class="text-[9px] text-gray-400 block uppercase font-bold">Year</span>
-                      <span class="font-mono text-gray-700">
-                        <%= row.year || 'N/A' %>
-                      </span>
-                    </div>
-                    <div class="w-24 text-right">
-                      <span class="text-[9px] text-gray-400 block uppercase font-bold">Percentage/CGPA</span>
-                      <span class="font-black text-blue-600">
-                        <%= row.percentage || row.marks || 'N/A' %>
-                      </span>
-                    </div>
-                  </div>
-                  <% }); %>
-              </div>
-            </div>
-            <% } %>
-        </section>
-
-        <section class="bg-white rounded-2xl shadow-sm border overflow-hidden">
-          <div class="px-6 py-4 bg-red-50 border-b border-red-100">
-            <h3 class="font-bold text-red-900 uppercase text-sm tracking-wider">Medical & Social Status</h3>
-          </div>
-          <div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div class="bg-gray-50 p-4 rounded-xl">
-              <label class="text-[10px] font-black text-gray-400 uppercase">BPL Status</label>
-              <p class="text-sm font-bold <%= admission.isBpl === 'Yes' ? 'text-red-600' : '' %>">
-                <%= admission.isBpl %>
-              </p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-xl">
-              <label class="text-[10px] font-black text-gray-400 uppercase">PWD Status</label>
-              <p class="text-sm font-bold <%= admission.isPwd === 'Yes' ? 'text-red-600' : '' %>">
-                <%= admission.isPwd %>
-              </p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-xl">
-              <label class="text-[10px] font-black text-gray-400 uppercase">Chronic Illness</label>
-              <p class="text-sm font-bold">
-                <%= admission.isChronic %>
-              </p>
-            </div>
-            <div class="bg-gray-50 p-4 rounded-xl">
-              <label class="text-[10px] font-black text-gray-400 uppercase">Psychological</label>
-              <p class="text-sm font-bold">
-                <%= admission.isPsychology %>
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section class="bg-white rounded-2xl shadow-sm border overflow-hidden" style="  page-break-inside: avoid;">
-          <div class="px-6 py-4 bg-gray-900 text-white flex justify-between items-center">
-            <h3 class="font-bold uppercase text-sm">Document Verification</h3>
-            <span class="text-[14px] font-bold text-green-400 tracking-widest " style="    background: white;
-    padding: 6px;
-    border-radius: 5px;
-    color: green;">PAYMENT: <%= admission.payStatusStudent %></span>
-          </div>
-          <div class="p-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            <% const docs=[ { label: '10th Marksheet' , url: admission.marksheet10Url }, { label: '12th Marksheet' ,
-              url: admission.marksheet12Url }, { label: 'Graduation' , url: admission.marksheetGradUrl }, {
-              label: 'Caste Certificate' , url: admission.casteCertificateUrl }, { label: 'Signature' , url:
-              admission.signatureUrl }, { label: 'BPL Card' , url: admission.bplFileUrl }, { label: 'PWD Certificate' ,
-              url: admission.pwdFileUrl }, { label: 'Fee Payment' , url: admission.paymentFileUrl,
-              color: 'text-green-600 bg-green-50 border-green-200' } ]; %>
-
-              <% docs.forEach(doc=> { %>
-                <div
-                  class="flex flex-col items-center p-4 border rounded-2xl hover:bg-gray-50 transition group <%= doc.color %>">
-                  <span
-                    class="text-[9px] font-black text-gray-400 uppercase mb-3 text-center h-6 flex items-center group-hover:text-gray-900 uppercase">
-                    <%= doc.label %>
-                  </span>
-
-                  <% if (doc.url) { %>
-                    <a href="/<%= doc.url %>" target="_blank" class="flex flex-col items-center">
-                      <div
-                        class="w-12 h-12 bg-white rounded-xl shadow-sm border flex items-center justify-center group-hover:scale-110 transition-transform">
-                        <i class="fas <%= doc.label.includes('Payment') ? 'fa-receipt' : 'fa-file-pdf' %> text-xl"></i>
-                      </div>
-                      <span
-                        class="text-[10px] mt-2 font-black text-blue-600 hover:underline cursor-pointer uppercase">Preview</span>
-                    </a>
-                    <% } else { %>
-                      <div class="w-12 h-12 bg-gray-50 text-gray-200 rounded-xl flex items-center justify-center">
-                        <i class="fas fa-times text-xl"></i>
-                      </div>
-                      <span class="text-[10px] text-gray-300 mt-2 font-bold uppercase">Missing</span>
-                      <% } %>
-                </div>
-                <% }) %>
-          </div>
-        </section>
+    <div class="text-right">
+      <div class="inline-block px-4 py-2 rounded-lg text-xs font-black uppercase border bg-blue-50 text-blue-700 border-blue-200">
+        Payment: <%= admission.payStatusStudent || 'Unpaid' %>
       </div>
     </div>
   </div>
 
-  <script>
-    function printPDF() {
-      const content = document.getElementById("printArea").innerHTML;
+  <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
 
-      const win = window.open("", "", "width=900,height=650");
+    <div class="lg:col-span-1 space-y-6">
+      <div class="bg-white rounded-2xl shadow-sm border p-6 text-center">
+        <div class="mb-4">
+          <% if (admission.photoUrl) { %>
+          <img src="/<%= admission.photoUrl %>" class="w-40 h-48 mx-auto object-cover rounded-xl shadow-md border-2 border-gray-100">
+          <% } else { %>
+          <div class="w-40 h-48 mx-auto bg-gray-100 rounded-xl flex items-center justify-center border-2 border-dashed">
+            <i class="fas fa-user-circle text-5xl text-gray-300"></i>
+          </div>
+          <% } %>
+        </div>
+        <h2 class="text-lg font-bold text-gray-900 leading-tight"><%= displayName %></h2>
+        <p class="text-xs text-gray-500 break-all mt-1"><%= admission.email || 'N/A' %></p>
 
-      win.document.write(`
+        <div class="mt-6 pt-6 border-t space-y-3 text-left">
+          <div class="flex justify-between">
+            <span class="text-[10px] font-black text-gray-400 uppercase">Blood Group</span>
+            <span class="text-xs font-bold"><%= admission.bloodGroup || 'N/A' %></span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-[10px] font-black text-gray-400 uppercase">Nationality</span>
+            <span class="text-xs font-bold"><%= admission.nationality || 'N/A' %></span>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl shadow-sm border p-6">
+           <h3 class="font-bold text-gray-900 mb-4 flex items-center">
+             <i class="fas fa-edit mr-2 text-blue-500"></i> Update Status
+           </h3>
+           <form action="/admin/admissions/<%= isMba ? 'mba' : 'bba' %>/<%= admission.id %>/status" method="POST"
+             class="space-y-4">
+             <div>
+               <label class="text-[10px] font-bold text-gray-400 uppercase">Admission Status</label>
+               <select name="status" class="w-full mt-1 p-2 border rounded-lg bg-gray-50 text-sm">
+                 <option value="pending" <%=admission.status==='pending' ? 'selected' : '' %>>Pending</option>
+                 <option value="approved" <%=admission.status==='approved' ? 'selected' : '' %>>Approved</option>
+                 <option value="rejected" <%=admission.status==='rejected' ? 'selected' : '' %>>Rejected</option>
+               </select>
+             </div>
+             <!-- <div>
+                         <label class="text-[10px] font-bold text-gray-400 uppercase">Entrance Exam Status</label>
+                         <select name="entranceExamStatus" class="w-full mt-1 p-2 border rounded-lg bg-gray-50 text-sm">
+                             <option value="Pending" <%= admission.entranceExamStatus === 'Pending' ? 'selected' : '' %>>Pending</option>
+                             <option value="Qualified" <%= admission.entranceExamStatus === 'Qualified' ? 'selected' : '' %>>Qualified</option>
+                             <option value="Not Qualified" <%= admission.entranceExamStatus === 'Not Qualified' ? 'selected' : '' %>>Not Qualified</option>
+                         </select>
+                     </div> -->
+             <button type="submit"
+               class="w-full bg-blue-600 text-white py-2 rounded-lg font-bold  hover:bg-blue-700 transition shadow-lg shadow-blue-100">
+               Save Changes
+             </button>
+           </form>
+           <br>
+           <button onclick="printPDF()"
+             class="w-full bg-blue-600 text-white py-2 px-2 rounded-lg flex gap-1  font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-100"
+             style="text-align: center;
+     justify-content: center;">
+             <svg fill="white" version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg"
+               xmlns:xlink="http://www.w3.org/1999/xlink" width="26px" height="26px" viewBox="0 0 584.332 584.332"
+               xml:space="preserve">
+               <g>
+                 <g>
+                   <path d="M530.33,42.289H54.003C24.176,42.289,0,66.464,0,96.29v192.751c0,29.827,24.176,54.003,54.003,54.003h102.532
+       L138.39,481.137c-2.026,15.38,2.683,30.893,12.907,42.552c10.214,11.659,24.984,18.354,40.506,18.354h200.738
+       c15.521,0,30.291-6.695,40.496-18.346c10.234-11.669,14.941-27.181,12.926-42.562l-18.166-138.094h102.531
+       c29.828,0,54.004-24.176,54.004-54.003V96.288C584.334,66.464,560.158,42.289,530.33,42.289z M70.606,144.374
+       c-17.481,0-31.651-14.169-31.651-31.65s14.17-31.653,31.651-31.653c17.48,0,31.65,14.17,31.65,31.653
+       C102.259,130.205,88.089,144.374,70.606,144.374z M403.754,498.008c-2.832,3.233-6.914,5.077-11.213,5.077H191.803
+       c-4.298,0-8.378-1.844-11.222-5.088c-2.825-3.225-4.127-7.523-3.568-11.782l25.459-193.691h179.399l25.471,193.69
+       C407.893,490.474,406.588,494.773,403.754,498.008z M454.723,277.599c0,20.82-11.907,38.767-29.264,47.659l-9.408-71.547
+       c-0.057-0.428-0.219-0.828-0.285-1.256v-38.421c0-8.228-6.694-14.923-14.922-14.923H183.469c-8.225,0-14.922,6.695-14.922,14.923
+       v38.507c-0.057,0.4-0.208,0.761-0.268,1.171l-9.406,71.558c-17.356-8.892-29.282-26.839-29.282-47.669v-63.566
+       c0-29.71,24.166-53.878,53.878-53.878h217.375c29.711,0,53.879,24.166,53.879,53.878V277.599L454.723,277.599z" />
+                 </g>
+               </g>
+             </svg>
+             Print
+           </button>
+         </div>
+       </div>
+<div class="lg:col-span-3 space-y-6">
+
+  <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+    <div class="px-5 py-3 bg-gray-50 border-b flex justify-between items-center">
+      <h3 class="text-[11px] font-black text-gray-600 uppercase">1. Personal & Identity Details</h3>
+    </div>
+    <div class="p-6 grid grid-cols-2 md:grid-cols-3 gap-y-6 gap-x-4">
+      <div><label class="block text-[9px] font-bold text-gray-400 uppercase">Full Name</label>
+        <p class="text-sm font-semibold"><%= displayName %></p>
+      </div>
+      <div><label class="block text-[9px] font-bold text-gray-400 uppercase">Mobile Number</label>
+        <p class="text-sm font-semibold"><%= admission.mobileNumber || 'N/A' %></p>
+      </div>
+      <div><label class="block text-[9px] font-bold text-gray-400 uppercase">Date of Birth</label>
+        <p class="text-sm font-semibold"><%= admission.dateOfBirth || 'N/A' %></p>
+      </div>
+      <div><label class="block text-[9px] font-bold text-gray-400 uppercase">Gender</label>
+        <p class="text-sm font-semibold"><%= admission.gender || 'N/A' %></p>
+      </div>
+      <div><label class="block text-[9px] font-bold text-gray-400 uppercase">Category</label>
+        <p class="text-sm font-semibold"><%= admission.category || 'N/A' %></p>
+      </div>
+      <div><label class="block text-[9px] font-bold text-gray-400 uppercase">Aadhaar Number</label>
+        <p class="text-sm font-mono"><%= admission.aadhaarNumber || 'N/A' %></p>
+      </div>
+      <% if(isMba) { %>
+      <div><label class="block text-[9px] font-bold text-gray-400 uppercase">PAN Number</label>
+        <p class="text-sm font-mono"><%= admission.panNumber || 'N/A' %></p>
+      </div>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+    <div class="px-5 py-3 bg-gray-50 border-b">
+      <h3 class="text-[11px] font-black text-gray-600 uppercase">2. Address & Location</h3>
+    </div>
+    <div class="p-6 space-y-6">
+      <div>
+        <h4 class="text-[10px] font-black text-blue-600 uppercase mb-2">Permanent Address</h4>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <% if(isMba) { %>
+          <div class="col-span-2"><label class="text-[8px] text-gray-400 uppercase block">Line 1</label><%= admission.permAddressLine1 %></div>
+          <div><label class="text-[8px] text-gray-400 uppercase block">City</label><%= admission.permCity %></div>
+          <div><label class="text-[8px] text-gray-400 uppercase block">Post Office</label><%= admission.permPostOffice %></div>
+          <div><label class="text-[8px] text-gray-400 uppercase block">Police Stn</label><%= admission.permPoliceStation %></div>
+          <div><label class="text-[8px] text-gray-400 uppercase block">District</label><%= admission.permDistrict %></div>
+          <div><label class="text-[8px] text-gray-400 uppercase block">State</label><%= admission.permState %></div>
+          <div><label class="text-[8px] text-gray-400 uppercase block">PIN</label><%= admission.permPinCode %></div>
+          <% } else { %>
+          <div class="col-span-4"><%= admission.permanentAddress || 'N/A' %></div>
+          <% } %>
+        </div>
+      </div>
+      <div class="pt-4 border-t">
+        <h4 class="text-[10px] font-black text-blue-600 uppercase mb-2">Correspondence Address</h4>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+          <div class="col-span-2"><label class="text-[8px] text-gray-400 uppercase block">Line</label><%= admission.corrAddressLine || admission.corrAddressLine1 %></div>
+          <div><label class="text-[8px] text-gray-400 uppercase block">City</label><%= admission.corrCity || 'N/A' %></div>
+          <div><label class="text-[8px] text-gray-400 uppercase block">District</label><%= admission.corrDistrict || 'N/A' %></div>
+          <div><label class="text-[8px] text-gray-400 uppercase block">State</label><%= admission.corrState || 'N/A' %></div>
+          <div><label class="text-[8px] text-gray-400 uppercase block">PIN Code</label><%= admission.corrPinCode || 'N/A' %></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+    <div class="px-5 py-3 bg-gray-50 border-b">
+      <h3 class="text-[11px] font-black text-gray-600 uppercase">3. Parent & Guardian Information</h3>
+    </div>
+    <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <% const parents = [
+            { role: 'Father', name: admission.fatherName, mob: admission.fatherMobile, occ: admission.fatherOccupation, inc: admission.fatherIncome },
+            { role: 'Mother', name: admission.motherName, mob: admission.motherMobile, occ: admission.motherOccupation, inc: admission.motherIncome },
+            { role: 'Guardian', name: admission.guardianName, mob: admission.guardianMobile, occ: admission.guardianOccupation || admission.guardianRelation, inc: admission.guardianAddress }
+          ]; %>
+      <% parents.forEach(p => { %>
+      <div class="bg-gray-50 p-4 rounded-xl space-y-1">
+        <span class="text-[9px] font-black text-gray-400 uppercase block border-b mb-2"><%= p.role %> Details</span>
+        <p class="text-sm font-bold"><%= p.name || 'N/A' %></p>
+        <p class="text-xs text-gray-600 italic"><%= p.occ || 'Occupation N/A' %></p>
+        <% if(p.inc && !p.inc.includes('Address')) { %> <p class="text-[10px] font-bold">Income: ₹<%= p.inc %></p> <% } %>
+        <p class="text-xs font-mono text-blue-600"><%= p.mob || 'No Contact' %></p>
+      </div>
+      <% }) %>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+    <div class="px-5 py-3 bg-gray-900 text-white flex justify-between">
+      <h3 class="text-[11px] font-black uppercase tracking-widest">4. Educational & Professional Records</h3>
+      <span class="text-[10px] uppercase font-bold">CGPA: <%= admission.cgpa || 'N/A' %></span>
+    </div>
+    <div class="p-6 space-y-6">
+      <table class="w-full text-left text-xs">
+        <thead class="bg-gray-50 text-gray-400 font-black uppercase">
+          <tr>
+            <th class="p-3">Examination</th>
+            <th class="p-3">Board/School</th>
+            <th class="p-3 text-center">Year</th>
+            <th class="p-3 text-right">Percentage</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y">
+          <tr>
+            <td class="p-3 font-bold">10th (Class X)</td>
+            <td class="p-3"><%= admission.c10Board %> | <%= admission.c10School %></td>
+            <td class="p-3 text-center"><%= admission.c10Year %></td>
+            <td class="p-3 text-right text-blue-600 font-black"><%= admission.c10Percentage %>%</td>
+          </tr>
+          <tr>
+            <td class="p-3 font-bold">12th (Class XII)</td>
+            <td class="p-3"><%= admission.c12Board %> | <%= admission.c12School %></td>
+            <td class="p-3 text-center"><%= admission.c12Year %></td>
+            <td class="p-3 text-right text-blue-600 font-black"><%= admission.c12Percentage %>%</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <% if(isMba) { %>
+      <div class="grid grid-cols-2 gap-4 bg-indigo-50 p-4 rounded-xl">
+        <div><label class="text-[8px] font-black uppercase text-indigo-400">Qualifying Exam(s)</label>
+          <p class="text-xs font-bold"><%= admission.qualifyingExams %></p>
+        </div>
+        <div><label class="text-[8px] font-black uppercase text-indigo-400">Exam Score</label>
+          <p class="text-xs font-bold"><%= admission.qualifyingExamScore %></p>
+        </div>
+        <div><label class="text-[8px] font-black uppercase text-indigo-400">Degree/Specialisation</label>
+          <p class="text-xs font-bold"><%= admission.degree %> (<%= admission.specialisation || 'N/A' %>)</p>
+        </div>
+        <div><label class="text-[8px] font-black uppercase text-indigo-400">Extra Curricular</label>
+          <p class="text-xs font-bold"><%= admission.extraCurricular || 'N/A' %></p>
+        </div>
+      </div>
+
+      <div>
+        <label class="text-[10px] font-black uppercase text-gray-400 block mb-2">Detailed Work Experience</label>
+        <% const workRows = safeParse(admission.workExperienceRows); %>
+        <% if(workRows.length > 0) { %>
+        <div class="space-y-2">
+          <% workRows.forEach(row => { %>
+          <div class="text-[11px] p-2 border-l-2 border-indigo-500 bg-gray-50 flex justify-between">
+            <span><b><%= row.organisation %></b> (<%= row.designation %>)</span>
+            <span class="text-gray-500"><%= row.fromDate %> to <%= row.toDate %></span>
+          </div>
+          <% }) %>
+        </div>
+        <% } else { %> <p class="text-xs text-gray-300 italic">No professional records found.</p> <% } %>
+      </div>
+      <% } %>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+    <div class="px-5 py-3 bg-gray-50 border-b">
+      <h3 class="text-[11px] font-black text-gray-600 uppercase">5. Comprehensive Document Checklist</h3>
+    </div>
+    <div class="p-6 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      <% 
+            const docMap = [
+              { label: 'Photo', url: admission.photoUrl },
+              { label: 'Signature', url: admission.signatureUrl },
+              { label: '10th Marksheet', url: admission.marksheet10Url },
+              { label: '12th Marksheet', url: admission.marksheet12Url },
+              { label: 'Grad Marksheet', url: admission.marksheetGradUrl },
+              { label: 'Caste Certificate', url: admission.casteCertificateUrl },
+              { label: 'BPL Card', url: admission.bplFileUrl },
+              { label: 'PWD Certificate', url: admission.pwdFileUrl },
+              { label: 'Experience Cert', url: admission.experienceCertificate },
+              { label: 'Payment Receipt', url: admission.paymentFileUrl }
+            ];
+          %>
+      <% docMap.forEach(doc => { %>
+      <div class="flex flex-col items-center p-3 border rounded-xl <%= doc.url ? 'bg-white' : 'bg-gray-50 opacity-40' %>">
+        <span class="text-[8px] font-black text-gray-400 uppercase text-center h-4 mb-2"><%= doc.label %></span>
+        <% if (doc.url) { %>
+        <a href="/<%= doc.url %>" target="_blank" class="text-blue-600 hover:scale-110 transition-transform"><i class="fas fa-file-pdf text-xl"></i></a>
+        <span class="text-[9px] mt-2 font-black text-green-600 uppercase">Uploaded</span>
+        <% } else { %>
+        <i class="fas fa-times-circle text-gray-200 text-xl"></i>
+        <span class="text-[9px] mt-2 font-bold text-gray-300 uppercase">Empty</span>
+        <% } %>
+      </div>
+      <% }) %>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-2xl shadow-sm border overflow-hidden">
+    <div class="px-5 py-3 bg-gray-50 border-b flex justify-between">
+      <h3 class="text-[11px] font-black text-gray-600 uppercase">6. Social Status & Declaration</h3>
+    </div>
+    <div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">Hostel Required</label>
+        <p class="text-xs font-bold uppercase"><%= admission.hostelRequired || 'No' %></p><% if(admission.hostelType) { %><p class="text-[9px] text-blue-500 font-bold"><%= admission.hostelType %></p><% } %>
+      </div>
+      <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">BPL Status</label>
+        <p class="text-xs font-bold <%= admission.isBpl === 'Yes' ? 'text-red-600' : '' %>"><%= admission.isBpl %></p>
+      </div>
+      <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">PWD Status</label>
+        <p class="text-xs font-bold <%= admission.isPwd === 'Yes' ? 'text-red-600' : '' %>"><%= admission.isPwd %></p>
+      </div>
+      <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">Chronic Illness</label>
+        <p class="text-xs font-bold"><%= admission.isChronic %></p>
+      </div>
+      <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">Psychological</label>
+        <p class="text-xs font-bold"><%= admission.isPsychology %></p>
+      </div>
+      <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">Passed 10+2</label>
+        <p class="text-xs font-bold uppercase"><%= admission.passed10Plus2 || 'N/A' %></p>
+      </div>
+      <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">Declaration</label>
+        <p class="text-xs font-bold uppercase text-green-600"><%= admission.declaration === 'true' ? 'Signed' : 'Not Signed' %></p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+</div>
+
+<script>
+  function printPDF() {
+    const content = document.getElementById("printArea").innerHTML;
+
+    const win = window.open("", "", "width=900,height=650");
+
+    win.document.write(`
     <html>
 
  <head>
@@ -623,8 +478,8 @@
  </html>
   `);
 
-      win.document.close();
-      win.focus();
-      win.print();
-    }
-  </script>
+    win.document.close();
+    win.focus();
+    win.print();
+  }
+</script>

@@ -19,6 +19,9 @@ router.get("/mba/:id", authMiddleware, mbaController.getMbaById);
 
 router.put("/mba/update/:id", authMiddleware, mbaController.updateApplicationFields);
 
+
+router.get("/bba/:id",  bbaController.getBbaById);
+router.get("/mba/:id", mbaController.getMbaById);
 // ---Works On both BBA & MBA.  ---
 
 router.put('/upload/:type/:id', authMiddleware, upload.any(), uploadController.uploadDocuments);
