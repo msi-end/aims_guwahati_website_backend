@@ -303,23 +303,18 @@
           
 
 
-
 <div class="mt-6">
   <label class="text-[10px] font-black uppercase text-gray-400 block mb-2">
     Detailed Work Experience
   </label>
 
   <% 
-    // We use a unique variable name 'finalWorkData' to avoid conflicts
     let finalWorkData = []; 
-    
     try {
       if (admission.workExperienceRows) {
-        // Handle if Prisma already parsed it as an object
         if (typeof admission.workExperienceRows === 'object') {
           finalWorkData = admission.workExperienceRows;
         } 
-        // Handle if it's a JSON string
         else if (typeof admission.workExperienceRows === 'string' && admission.workExperienceRows.trim() !== "") {
           finalWorkData = JSON.parse(admission.workExperienceRows);
         }
@@ -335,22 +330,31 @@
       <table class="w-full text-xs text-left">
         <thead class="bg-gray-50 text-gray-400 uppercase font-black border-b">
           <tr>
-            <th class="p-4">Company</th>
-            <th class="p-4">Role</th>
-            <th class="p-4 text-right">Duration</th>
+            <th class="p-4">Organization</th>
+            <th class="p-4">Designation</th>
+            <th class="p-4">Period</th>
+            <th class="p-4 text-right">Months</th>
           </tr>
         </thead>
         <tbody class="divide-y bg-white">
           <% finalWorkData.forEach(function(row) { %>
             <tr class="hover:bg-gray-50 transition-colors">
               <td class="p-4 font-bold text-gray-900">
-                <%= row.company || row.organisation || 'N/A' %>
+                <%= row.org || 'N/A' %>
               </td>
+              
               <td class="p-4 text-gray-700">
-                <%= row.role || row.designation || 'N/A' %>
+                <%= row.desig || 'N/A' %>
               </td>
-              <td class="p-4 text-right font-mono text-blue-600">
-                <%= row.duration || '—' %>
+
+              <td class="p-4 text-gray-600">
+                <span class="bg-gray-100 px-2 py-1 rounded text-[10px]">
+                  <%= row.from %> to <%= row.to %>
+                </span>
+              </td>
+              
+              <td class="p-4 text-right font-mono text-blue-600 font-bold">
+                <%= row.experienceMonths %> Months
               </td>
             </tr>
           <% }); %>
@@ -359,14 +363,10 @@
     </div>
   <% } else { %>
     <div class="p-6 border border-dashed rounded-xl text-center bg-gray-50/50">
-      <p class="text-xs text-gray-400 font-medium italic">No professional work records found for this applicant.</p>
+      <p class="text-xs text-gray-400 font-medium italic">No professional work records found.</p>
     </div>
   <% } %>
 </div>
-
-
-
-
 
 
 
