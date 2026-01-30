@@ -38,7 +38,7 @@
       </h1>
       <div class="flex gap-4 text-xs font-mono text-gray-500 uppercase">
         <span>App No: <b class="text-gray-900"><%= admission.student?.applicationNo || 'N/A' %></b></span>
-        <span>Internal ID: #<%= admission.id %></span>
+        <span>Internal ID: #<%= admission.student?.id %></span>
         <span>Applied: <%= admission.createdAt.toLocaleDateString('en-IN') %></span>
       </div>
     </div>
