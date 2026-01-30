@@ -26,12 +26,16 @@
 </style>
 
 <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8 bg-gray-50 min-h-screen" id="printArea">
+  <nav class="flex mb-2 print:hidden">
+      <a href="/admin/admissions?courseType=<%= isMba ? 'MBA' : 'BBA' %>" class="text-sm text-blue-600 font-bold hover:underline">
+        <i class="fas fa-arrow-left mr-1"></i> Back to Admissions List
+      </a>
+    </nav>
 
   <div class="flex flex-col md:flex-row justify-between mb-8 border-b bg-white p-6 rounded-2xl shadow-sm">
     <div class="space-y-1">
       <h1 class="text-3xl font-black text-gray-900 uppercase tracking-tighter">
-        <%= isMba ? 'MBA' : 'BBA' %> FULL APPLICATION RECORD adadf
-      </h1>
+        <%= isMba ? 'MBA' : 'BBA' %> FULL APPLICATION RECORD</h1>
       <div class="flex gap-4 text-xs font-mono text-gray-500 uppercase">
         <span>App No: <b class="text-gray-900"><%= admission.student?.applicationNo || 'N/A' %></b></span>
         <span>Internal ID: #<%= admission.id %></span>
