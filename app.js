@@ -8,6 +8,7 @@ const flash = require("connect-flash");
 const cookieParser = require("cookie-parser");
 const methodOverride = require("method-override");
 const expressLayouts = require("express-ejs-layouts");
+const sgMail = require("@sendgrid/mail");
 
 const prisma = require("./config/db");
 const { sendError } = require("./utils/apiResponse");
@@ -37,6 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use(morgan("dev"));
 app.use(methodOverride("_method"));
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 app.use(
   session({
@@ -91,6 +93,26 @@ app.use("/api/notifications", require("./routes/api/notifications"));
 app.use("/api/placementRecords", require("./routes/api/placementRecords"));
 
 app.get("/", (req, res) => res.redirect("/admin/login"));
+
+
+app.get('/test-mail', async (req, res) => {
+  try {
+    const msg = {
+      to: "p.deka.1625@gmail.com",
+      from: "no-reply@aimguwahati.edu.in",
+      subject: "Hello from Node.js + SendGrid",
+      text: "This is a test email",
+      html: "<h1>Hello!</h1><p>This email was sent using SendGrid.</p>",
+    };
+
+    await sgMail.send(msg);
+    console.log("Email sent successfully!");
+    return res.status(200).json({ msg: "Email Sent Successfull" })
+  } catch (error) {
+    console.error("Error sending email:", error.response?.body || error.message);
+    return res.status(500).json({ msg: "Email Not Sent Successfull" })
+  }
+})
 
 // ===================
 // ERROR HANDLER

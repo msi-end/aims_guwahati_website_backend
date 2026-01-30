@@ -13,6 +13,8 @@ const showLogin = asyncHandler(async (req, res) => {
     currentYear: new Date().getFullYear(),
   });
 });
+
+
 const createAdminUser = asyncHandler(async (req, res) => {
   const { username, email, password, role } = req.body;
   if (!username || !email || !password) {
@@ -55,6 +57,7 @@ const createAdminUser = asyncHandler(async (req, res) => {
     data: null,
   });
 });
+
 const login = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
   console.log(username, password);
@@ -85,6 +88,8 @@ const login = asyncHandler(async (req, res) => {
   req.flash("success", "Login successful!");
   res.redirect("/admin/admissions");
 });
+
+
 const logout = asyncHandler(async (req, res) => {
   req.session.destroy((err) => {
     if (err) {

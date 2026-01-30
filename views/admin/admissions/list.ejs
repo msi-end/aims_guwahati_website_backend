@@ -29,6 +29,19 @@
           <option value="rejected" <%= filters.status === 'rejected' ? 'selected' : '' %>>Rejected</option>
         </select>
       </div>
+
+
+      <div class="flex items-center space-x-2">
+        <label class="text-sm font-medium text-gray-700">Search:</label>
+        <input 
+          type="text" 
+          id="searchInput"
+          value="<%= filters.search || '' %>"
+          placeholder="Search name, email, ID..."
+          oninput="handleSearch()"
+          class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-sm w-64"
+        />
+      </div>
     </div>
 
     <!-- <div class="flex items-center space-x-2">
@@ -69,7 +82,7 @@
           <th>Student Name</th>
           <th>Contact Info</th>
           <th>Course</th>
-          <th>Status</th>
+          <th>Approval Status</th>
           <th>Form Submission</th>
           <th>Applied Date</th>
           <th>Actions</th>
@@ -82,7 +95,7 @@
              const displayName = admission.fullName || (admission.firstName + ' ' + (admission.lastName || ''));
              const displayEmail = admission.email || admission.student?.email || 'N/A';
           %>
-        <tr>
+        <tr class="admission-row" data-name="<%= displayName %>" data-email="<%= displayEmail %>">
           <td class="font-mono text-sm text-blue-600 font-bold">
             <%= admission.student?.applicationNo || 'N/A' %>
           </td>
@@ -192,6 +205,24 @@
       form.submit();
     }
   }
+
+
+  function handleSearch() {
+    const query = document.getElementById('searchInput').value.toLowerCase();
+    const rows = document.querySelectorAll('.admission-row')
+
+    rows.forEach(row => {
+      const name = row.dataset.name.toLowerCase();
+      const email = row.dataset.email.toLowerCase();
+
+      if (name.includes(query) || email.includes(query)) {
+        row.style.display = '';
+      } else {
+        row.style.display = 'none';
+      }
+    });
+  }
+
 </script>
 <script>
   function triggerExport(course) {

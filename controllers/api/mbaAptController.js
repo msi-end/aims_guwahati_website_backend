@@ -132,3 +132,35 @@ exports.updateApplicationFields = async (req, res) => {
     return sendError(res, "Update failed: " + error.message);
   }
 };
+
+
+exports.updateApplicationPayment = async (req, res) => {
+  try {
+    const updateData = req.body;
+
+    const recordId = parseInt(req.params.id);
+    const existingRecord = await prisma.mbaApplication.findFirst({
+      where: { studentId: recordId },
+    });
+
+    if (!existingRecord) {
+      return sendError(res, "Application record not found", null, 404);
+    }
+
+    // 5. Perform the Dynamic Update
+    // Prisma's 'update' only changes fields present in the 'data' object (Partial Update)
+    const updatedRecord = await prisma.mbaApplication.update({
+      where: { id: existingRecord.id },
+      data: updateData,
+    });
+
+    return sendSuccess(
+      res,
+      `Payment Status Updated Successfully`,
+      updatedRecord
+    );
+  } catch (error) {
+    console.error("Update Error:", error);
+    return sendError(res, "Update failed: " + error.message);
+  }
+};

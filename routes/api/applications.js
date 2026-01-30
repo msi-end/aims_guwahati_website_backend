@@ -18,6 +18,7 @@ router.post("/mba/submit", authMiddleware, mbaController.createMbaApplication);
 router.get("/mba/:id", authMiddleware, mbaController.getMbaById);
 
 router.put("/mba/update/:id", authMiddleware, mbaController.updateApplicationFields);
+router.put("/mba/update_payment/:id", mbaController.updateApplicationPayment);
 
 
 router.get("/bba/get/:id",  bbaController.getBbaById);

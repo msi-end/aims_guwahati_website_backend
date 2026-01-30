@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { sendSuccess, sendError } = require("../../utils/apiResponse");
 const crypto = require("crypto");
+const { sendMailToUser } = require("../../utils/sendEmail");
 // const { sendEmail } = require("../../utils/emailHelper"); // You'll need an email utility
 
 
@@ -81,6 +82,7 @@ exports.registerStudent = async (req, res) => {
     );
 
     const { password: _, ...studentData } = result.student;
+    sendMailToUser(email, 'registration', fullName)
     return sendSuccess(res,"Registration successful",{
         token,
         student: studentData,
