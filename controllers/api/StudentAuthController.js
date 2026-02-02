@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { sendSuccess, sendError } = require("../../utils/apiResponse");
 const crypto = require("crypto");
-const { sendMailToUser } = require("../../utils/sendEmail");
+const { sendMailToUser, sendMailToUserForOtp } = require("../../utils/sendEmail");
 // const { sendEmail } = require("../../utils/emailHelper"); // You'll need an email utility
 
 
@@ -251,7 +251,7 @@ exports.forgotPassword = async (req, res) => {
 
     const student = await prisma.student.findUnique({ where: { email } });
     if (!student) {
-      return sendSuccess(res, "If that email exists, an OTP has been sent.");
+      return sendSuccess(res, "No Email Recored Found!");
     }
 
     // Generate a 6-digit OTP
@@ -266,11 +266,9 @@ exports.forgotPassword = async (req, res) => {
       },
     });
 
-    // await sendEmail(email, "Password Reset OTP", `Your OTP is ${otp}`);
+    await sendMailToUserForOtp(email, otp)
 
-    console.log(`OTP for ${email}: ${otp}`); // Temporary for testing
-
-    return sendSuccess(res, "Password reset OTP sent to your email.");
+    return sendSuccess(res, "Password reset OTP sent to your email.", {otp, expires});
   } catch (error) {
     return sendError(res, error.message);
   }
