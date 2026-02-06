@@ -158,13 +158,13 @@
           <div><label class="block text-[9px] font-bold text-gray-400 uppercase">Category</label>
             <p class="text-sm font-semibold"><%= admission.category || 'N/A' %></p>
           </div>
-          <div><label class="block text-[9px] font-bold text-gray-400 uppercase">Aadhaar Number</label>
+          <!-- <div><label class="block text-[9px] font-bold text-gray-400 uppercase">Aadhaar Number</label>
             <p class="text-sm font-mono"><%= admission.aadhaarNumber || 'N/A' %></p>
-          </div>
+          </div> -->
           <% if(isMba) { %>
-          <div><label class="block text-[9px] font-bold text-gray-400 uppercase">PAN Number</label>
+          <!-- <div><label class="block text-[9px] font-bold text-gray-400 uppercase">PAN Number</label>
             <p class="text-sm font-mono"><%= admission.panNumber || 'N/A' %></p>
-          </div>
+          </div> -->
           <% } %>
         </div>
       </div>
@@ -398,14 +398,7 @@
           <% 
             const docMap = [
               { label: 'Photo', url: admission.photoUrl },
-              { label: 'Signature', url: admission.signatureUrl },
-              { label: '10th Marksheet', url: admission.marksheet10Url },
-              { label: '12th Marksheet', url: admission.marksheet12Url },
-              { label: 'Grad Marksheet', url: admission.marksheetGradUrl },
-              { label: 'Caste Certificate', url: admission.casteCertificateUrl },
-              { label: 'BPL Card', url: admission.bplFileUrl },
-              { label: 'PWD Certificate', url: admission.pwdFileUrl },
-              { label: 'Experience Cert', url: admission.experienceCertificate },
+              { label: 'Signature', url: admission.signatureUrl },             
               { label: 'Payment Receipt', url: admission.paymentFileUrl }
             ];
           %>
@@ -429,23 +422,23 @@
           <h3 class="text-[11px] font-black text-gray-600 uppercase">6. Social Status & Declaration</h3>
         </div>
         <div class="p-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-          <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">Hostel Required</label>
+          <!-- <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">Hostel Required</label>
             <p class="text-xs font-bold uppercase"><%= admission.hostelRequired || 'No' %></p><% if(admission.hostelType) { %><p class="text-[9px] text-blue-500 font-bold"><%= admission.hostelType || 'N/A' %>( Hostel Type)</p><% } %>
             <p class="text-xs font-bold uppercase"> Food preference:
             <p class="text-[9px] text-blue-500 font-bold"><%= admission.hostelSpecialReq || 'N/A' %></p>
-          </div>
+          </div> -->
           <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">BPL Status</label>
             <p class="text-xs font-bold <%= admission.isBpl === 'Yes' ? 'text-red-600' : '' %>"><%= admission.isBpl %></p>
           </div>
           <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">PWD Status</label>
             <p class="text-xs font-bold <%= admission.isPwd === 'Yes' ? 'text-red-600' : '' %>"><%= admission.isPwd %></p>
           </div>
-          <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">Chronic Illness</label>
+          <!-- <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">Chronic Illness</label>
             <p class="text-xs font-bold"><%= admission.isChronic %></p>
           </div>
           <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">Psychological</label>
             <p class="text-xs font-bold"><%= admission.isPsychology %></p>
-          </div>
+          </div> -->
           <div class="p-3 border rounded-xl"><label class="text-[8px] block font-black text-gray-400 uppercase">Passed 10+2</label>
             <p class="text-xs font-bold uppercase"><%= admission.passed10Plus2 || 'N/A' %></p>
           </div>
