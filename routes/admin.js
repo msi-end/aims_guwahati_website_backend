@@ -12,7 +12,7 @@ router.get('/logout', isAuthenticated, adminController.logout);
 
 // Dashboard
 router.get('/', isAuthenticated, (req, res) => res.redirect('/admin/admissions'));
-router.get('/admissions', isAuthenticated, adminController.showDashboard);
+// router.get('/admissions', isAuthenticated, adminController.showDashboard);
 
 // Admissions Management
 router.get('/admissions/export/csv', adminController.exportAdmissionsCSV);
