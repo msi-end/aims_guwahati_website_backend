@@ -19,7 +19,7 @@ const isAuthenticated = (req, res, next) => {
  */
 const isGuest = (req, res, next) => {
   if (req.session && req.session.adminId) {
-    return res.redirect('/admin/dashboard');
+    return res.redirect('/admin/admissions');
   }
   next();
 };
