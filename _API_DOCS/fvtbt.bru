@@ -1,0 +1,19 @@
+meta {
+  name: fvtbt
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:3000/api/blogs
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  title: this fro bruno
+  text: <p>hello I am pancha this is my first article&nbsp;</p>
+  tags: ["apple","banana","mango"]
+  titleUrl: this-is-form
+  coverImg: @file(C:\Users\panch\Downloads\routine 02 feb.jpeg)
+}
