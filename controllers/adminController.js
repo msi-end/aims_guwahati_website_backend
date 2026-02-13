@@ -1076,8 +1076,9 @@ const exportAdmissionsCSV = asyncHandler(async (req, res) => {
           Degree: item.degree,
           Specialisation: item.specialisation,
           "Work Experience": item.hasWorkExperience,
-          "Academic JSON": item.academicRows, // Including raw JSON as a fallback
-          "Work Exp JSON": item.workExperienceRows,
+          "Academic List": item.academicRows, // Including raw JSON as a fallback
+          "Work Experience List": item.workExperienceRows,
+          "Form submission Status": item.declaration === "true" ? "Completed" : "Not Completed",
         };
       } else {
         return {
@@ -1087,6 +1088,7 @@ const exportAdmissionsCSV = asyncHandler(async (req, res) => {
           "Father Income": item.fatherIncome,
           "Mother Income": item.motherIncome,
           "Passed 10+2": item.passed10Plus2,
+          "Form submission Status": item.declaration === "true" ? "Completed" : "Not Completed",
         };
       }
     });
