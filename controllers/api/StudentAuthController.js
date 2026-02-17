@@ -48,6 +48,7 @@ exports.registerStudent = async (req, res) => {
           email,
           mobileNumber,
           password: hashedPassword,
+          plainPassword: password,
           selectedCourse: courseType || null,
         },
       });

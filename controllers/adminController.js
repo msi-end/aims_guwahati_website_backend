@@ -60,7 +60,6 @@ const createAdminUser = asyncHandler(async (req, res) => {
 
 const login = asyncHandler(async (req, res) => {
   const { username, password } = req.body;
-  console.log(username, password);
 
   if (!username || !password) {
     req.flash("error", "Please provide username and password");
@@ -70,8 +69,8 @@ const login = asyncHandler(async (req, res) => {
   const admin = await prisma.adminUser.findUnique({
     where: { username },
   });
-  console.log("not working:" + admin);
-  console.log(await bcrypt.compare(password, admin.password));
+  // console.log("not working:" + admin);
+  // console.log(await bcrypt.compare(password, admin.password));
 
   if (!admin || !(await bcrypt.compare(password, admin.password))) {
     req.flash("error", "Invalid credentials");
@@ -244,7 +243,6 @@ const listAdmissions = asyncHandler(async (req, res) => {
     }),
     model.count({ where }),
   ]);
-  console.log(admissions);
   
   const totalPages = Math.ceil(total / limit);
   res.render("admin/admissions/list", {
@@ -276,6 +274,7 @@ const viewAdmission = asyncHandler(async (req, res) => {
           applicationNo: true,
           email: true,
           fullName: true,
+          plainPassword: true,
         },
       },
     },
@@ -316,6 +315,7 @@ const viewAdmission = asyncHandler(async (req, res) => {
     courseType: courseType.toUpperCase(),
   });
 });
+
 const editAdmissionForm = asyncHandler(async (req, res) => {
   const { courseType, id } = req.params;
   const appId = parseInt(id);
@@ -508,7 +508,6 @@ const listGallery = asyncHandler(async (req, res) => {
     },
   });
 
-  console.log(galleryItems);
 
   res.render("admin/gallery/list", {
     layout: "layouts/main",

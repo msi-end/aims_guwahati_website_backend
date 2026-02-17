@@ -1,0 +1,25 @@
+meta {
+  name: update from admmin
+  type: http
+  seq: 5
+}
+
+put {
+  url: https://aims.reynrel.in/api/admission/mba/update/:id
+  body: json
+  auth: bearer
+}
+
+params:path {
+  id: 1
+}
+
+auth:bearer {
+  token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NDYsInJvbGUiOiJzdHVkZW50IiwiYXBwbGljYXRpb25ObyI6IjAxMjYwMDEwMTciLCJpYXQiOjE3NzEzNTExNzAsImV4cCI6MTc3MTM1NDc3MH0.2jzX13DIQ4fjcqZYirs35aiqGF2UkpnzjEPp_Mox5fo
+}
+
+body:json {
+  {
+    "declaration": "true"
+  }
+}

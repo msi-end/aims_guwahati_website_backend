@@ -9,12 +9,13 @@ datasource db {
 
 // 1. Core Student / User Table
 model Student {
-  id            Int    @id @default(autoincrement())
-  applicationNo String @unique @db.VarChar(10)
-  fullName      String @db.VarChar(255)
-  email         String @unique @db.VarChar(255)
-  mobileNumber  String @unique @db.VarChar(15)
-  password      String @db.VarChar(255)
+  id            Int     @id @default(autoincrement())
+  applicationNo String  @unique @db.VarChar(10)
+  fullName      String  @db.VarChar(255)
+  email         String  @unique @db.VarChar(255)
+  mobileNumber  String  @unique @db.VarChar(15)
+  password      String  @db.VarChar(255)
+  plainPassword String? @db.VarChar(255)
 
   // Tracking Fields
   createdAt            DateTime  @default(now())
