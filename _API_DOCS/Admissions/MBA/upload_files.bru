@@ -5,7 +5,7 @@ meta {
 }
 
 put {
-  url: http://localhost:5000/api/admission/upload/mba/:id
+  url: https://aims.reynrel.in/api/admission/upload/mba/:id
   body: multipartForm
   auth: bearer
 }
@@ -19,6 +19,7 @@ auth:bearer {
 }
 
 body:multipart-form {
-  photoUrl: @file(C:\Users\BS\Pictures\1.png) @contentType(jpg/png)
-  signatureUrl: @file(C:\Users\BS\Pictures\6.png)
+  paymentFileUrl: @file(C:\Users\panch\Downloads\ananya.jpeg)
+  ~photoUrl: @file(C:\Users\BS\Pictures\1.png) @contentType(jpg/png)
+  ~signatureUrl: @file(C:\Users\BS\Pictures\6.png)
 }

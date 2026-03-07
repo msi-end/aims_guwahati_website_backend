@@ -236,14 +236,14 @@ const listAdmissions = asyncHandler(async (req, res) => {
           select: {
             applicationNo: true,
             email: true,
-            isFormSubmitted:true
+            isFormSubmitted: true
           },
         },
       },
     }),
     model.count({ where }),
   ]);
-  
+
   const totalPages = Math.ceil(total / limit);
   res.render("admin/admissions/list", {
     layout: "layouts/main",
@@ -1036,7 +1036,6 @@ const exportAdmissionsCSV = asyncHandler(async (req, res) => {
         "Application No": item.student?.applicationNo || "N/A",
         Status: item.status,
         "Applied Date": new Date(item.createdAt).toLocaleString("en-IN"),
-        "Payment Status": item.payStatusStudent,
         "Full Name":
           item.fullName ||
           `${item.firstName} ${item.middleName || ""} ${item.lastName || ""}`
@@ -1055,17 +1054,82 @@ const exportAdmissionsCSV = asyncHandler(async (req, res) => {
         Guardian: `${item.guardianName || ""} (${item.guardianRelation || ""})`,
         "Hostel Required": item.hostelRequired,
         "Hostel Type": item.hostelType || "N/A",
-        "10th Board": item.c10Board,
-        "10th %": item.c10Percentage,
-        "12th Board": item.c12Board,
-        "12th %": item.c12Percentage,
         "Is BPL": item.isBpl,
         "Is PWD": item.isPwd,
         "Chronic Illness": item.isChronic,
       };
 
       // Course Specific Additions
+
+      // if (courseType === "MBA") {
+      //   return {
+      //     ...base,
+      //     "PAN Number": item.panNumber,
+      //     "Perm Address": `${item.permAddressLine1}, ${item.permCity}, ${item.permDistrict}, ${item.permState} - ${item.permPinCode}`,
+      //     "Qualifying Exam": item.qualifyingExams,
+      //     "Exam Score": item.qualifyingExamScore,
+      //     Degree: item.degree,
+      //     Specialisation: item.specialisation,
+      //     "Work Experience": item.hasWorkExperience,
+      //     "Academic List": item.academicRows, // Including raw JSON as a fallback
+      //     "Work Experience List": item.workExperienceRows,
+      //     "Form submission Status": item.declaration === "true" ? "Completed" : "Not Completed",
+      //     "Payment Status": item.payStatusStudent,
+      //   };
+      // } else {
+      //   return {
+      //     ...base,
+      //     "Permanent Address": item.permanentAddress,
+      //     "Corr Address": `${item.corrAddressLine}, ${item.corrDistrict}, ${item.corrState} - ${item.corrPinCode}`,
+      //     "Father Income": item.fatherIncome,
+      //     "Mother Income": item.motherIncome,
+      //     "Passed 10+2": item.passed10Plus2,
+      //     "Form submission Status": item.declaration === "true" ? "Completed" : "Not Completed",
+      //   };
+      // }
+
+      // Course Specific Additions
       if (courseType === "MBA") {
+
+        let academicFields = {};
+
+        if (item.academicRows && Array.isArray(JSON.parse(item.academicRows))) {
+          JSON.parse(item.academicRows).forEach((row, index) => {
+            const i = index + 1;
+
+            row.exam && (academicFields[`Exam${i}-Name`] = row.exam);
+            row.board && (academicFields[`Exam${i}-Board`] = row.board);
+            row.institution && (academicFields[`Exam${i}-Institution`] = row.institution);
+            row.year && (academicFields[`Exam${i}-Year`] = row.year);
+            row.maxMarks && (academicFields[`Exam${i}-MaxMarks`] = row.maxMarks);
+            row.marksObtained && (academicFields[`Exam${i}-MarksObtained`] = row.marksObtained);
+            row.percentage && (academicFields[`Exam${i}-Percentage`] = row.percentage);
+          });
+        }
+
+
+        // -------- Work Experience Rows --------
+        let workFields = {};
+
+        let workRows = [];
+        try {
+          workRows = typeof item.workExperienceRows === "string"
+            ? JSON.parse(item.workExperienceRows)
+            : item.workExperienceRows || [];
+        } catch (e) {
+          workRows = [];
+        }
+
+        workRows.forEach((row, index) => {
+          const i = index + 1;
+
+          row.org && (workFields[`Work${i}-Organization`] = row.org || "");
+          row.desig && (workFields[`Work${i}-Designation`] = row.desig || "");
+          row.from && (workFields[`Work${i}-From`] = row.from || "");
+          row.to && (workFields[`Work${i}-To`] = row.to || "");
+          row.experienceMonths && (workFields[`Work${i}-ExperienceMonths`] = row.experienceMonths || "");
+        });
+
         return {
           ...base,
           "PAN Number": item.panNumber,
@@ -1074,10 +1138,11 @@ const exportAdmissionsCSV = asyncHandler(async (req, res) => {
           "Exam Score": item.qualifyingExamScore,
           Degree: item.degree,
           Specialisation: item.specialisation,
-          "Work Experience": item.hasWorkExperience,
-          "Academic List": item.academicRows, // Including raw JSON as a fallback
-          "Work Experience List": item.workExperienceRows,
+          ...academicFields, // <-- dynamically added columns
+          ...workFields, // <-- dynamically added columns
+
           "Form submission Status": item.declaration === "true" ? "Completed" : "Not Completed",
+          "Payment Status": item.payStatusStudent,
         };
       } else {
         return {
@@ -1090,6 +1155,9 @@ const exportAdmissionsCSV = asyncHandler(async (req, res) => {
           "Form submission Status": item.declaration === "true" ? "Completed" : "Not Completed",
         };
       }
+
+
+
     });
 
     const parser = new Parser();
