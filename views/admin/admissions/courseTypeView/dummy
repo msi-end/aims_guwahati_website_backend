@@ -5,3 +5,16 @@
               { label: 'BPL Card', url: admission.bplFileUrl },
               { label: 'PWD Certificate', url: admission.pwdFileUrl },
               { label: 'Experience Cert', url: admission.experienceCertificate },
+
+
+
+              //// For BBA Files
+
+                <!-- { label: '10th Marksheet', url: admission.marksheet10Url },
+              { label: '12th Marksheet', url: admission.marksheet12Url },
+              { label: 'Grad Marksheet', url: admission.marksheetGradUrl },
+              { label: 'Caste Certificate', url: admission.casteCertificateUrl },
+              { label: 'BPL Card', url: admission.bplFileUrl },
+              { label: 'PWD Certificate', url: admission.pwdFileUrl },
+              { label: 'Experience Cert', url: admission.experienceCertificate },
+              { label: 'Payment Receipt', url: admission.paymentFileUrl } -->
